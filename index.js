@@ -1,23 +1,33 @@
-const { Client, MessageEmbed } = require('discord.js');
-const config = require('./config');
-const commands = require('./help');
+const { Client } = require("discord.js");
 
-let bot = new Client({
-  //fetchAllMembers: true, // Remove this if the bot is in large guilds.
-  presence: {
-    status: 'online',
-    activity: {
-      name: `${config.prefix}help`,
-      type: 'LISTENING'
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+bot.on("ready", () => console.log(`Logged in as ${bot.user.tag}.`));
+
+client.on("interactionCreate", async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName } = interaction;
+
+    switch (commandName) {
+        case "help":
+            interaction.reply("TBD: List of commands");
+            break;
+        case "ping":
+            interaction.reply("Pong!");
+            break;
+        case "add-coins":
+            interaction.reply("TBD: Add coins to a user.");
+            break;
+        default:
+            interaction.reply("Unknown command.");
+            break;
     }
-  }
 });
-
-bot.on('ready', () => console.log(`Logged in as ${bot.user.tag}.`));
 
 // bot.on('message', async message => {
 //   return;
 // });
 
-require('./server')();
+require("./server")();
 bot.login(config.token);

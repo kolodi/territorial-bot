@@ -1,36 +1,31 @@
-const {REST} = require('@discordjs/rest');
-const {Routes} = require('discord-api-types/v9');
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const commands = [
-  {
-    name: 'help',
-    description: 'Shows the list of commands or help on specified command.',
-    format: 'help [command-name]'
-  },
-  {
-    name: 'ping',
-    description: 'Checks connectivity with discord\'s servers.',
-    format: 'ping'
-  },
-  {
-    name: 'add coins',
-    aliases: ['add-points'],
-    description: 'Add coins to a user',
-    format: 'add coins <user mention> <amount>'
-  }
-];
+    new SlashCommandBuilder()
+        .setName("help")
+        .setDescription("Shows the list of commands or help on specified command."),
+    new SlashCommandBuilder()
+        .setName("ping")
+        .setDescription("Checks connectivity with discord's servers."),
+    new SlashCommandBuilder().setName("add-coins").setDescription("Add coins to a user."),
+].map((command) => command.toJSON());
 
-const rest = new REST({version: '9'}).setToken(process.env.TOKEN);
+const commandsBody = JSON.stringify(commands);
+
+const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
 (async () => {
-  try {
-    console.log('Started refreshing application (/) commands.');
+    try {
+        console.log("Started refreshing application (/) commands.");
 
-    await rest.put(Routes.applicationCommands(process.env.APP_ID), {
-      body: commands,
-    });
+        await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+            { body: commands }
+        );
 
-    console.log('Successfully reloaded application (/) commands.');
-  } catch (error) {
-    console.error(error);
-  }
+        console.log("Successfully reloaded application (/) commands.");
+    } catch (error) {
+        console.error(error);
+    }
 })();
