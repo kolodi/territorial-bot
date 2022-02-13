@@ -1,8 +1,8 @@
-const { Client } = require("discord.js");
+const { Client, Intents  } = require("discord.js");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-bot.on("ready", () => console.log(`Logged in as ${bot.user.tag}.`));
+client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
 client.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
@@ -30,4 +30,4 @@ client.on("interactionCreate", async (interaction) => {
 // });
 
 require("./server")();
-bot.login(config.token);
+client.login(process.env.TOKEN);
