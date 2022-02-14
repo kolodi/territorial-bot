@@ -12,29 +12,69 @@ const commands = [
     new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Checks connectivity with discord's servers."),
+    // new SlashCommandBuilder()
+    //     .setName("add-coins")
+    //     .setDescription("Add coins to a user.")
+    //     .addMentionableOption((opt) =>
+    //         opt.setName("user").setDescription("The user to add coins to.").setRequired(true)
+    //     )
+    //     .addIntegerOption((opt) =>
+    //         opt
+    //             .setName("amount")
+    //             .setDescription("The amount of coins to add.")
+    //             .setRequired(true)
+    //             .setMinValue(10)
+    //             .setMaxValue(1000)
+    //     ),
     new SlashCommandBuilder()
-        .setName("add-coins")
-        .setDescription("Add coins to a user.")
-        .addMentionableOption((opt) =>
-            opt.setName("user").setDescription("The user to add coins to.").setRequired(true)
+        .setName("coins")
+        .setDescription("add/remove/show coins for a user")
+        .addSubcommand((sub) =>
+            sub
+                .setName("add")
+                .setDescription("add coins to a user")
+                .addMentionableOption((opt) =>
+                    opt
+                        .setName("user")
+                        .setDescription("The user to add coins to.")
+                        .setRequired(true)
+                )
+                .addIntegerOption((opt) =>
+                    opt
+                        .setName("amount")
+                        .setDescription("The amount of coins to add.")
+                        .setRequired(true)
+                        .setMinValue(10)
+                        .setMaxValue(1000)
+                )
         )
-        .addIntegerOption((opt) =>
-            opt.setName("amount").setDescription("The amount of coins to add.").setRequired(true).setMinValue(10).setMaxValue(1000)
+        .addSubcommand((sub) =>
+            sub
+                .setName("remove")
+                .setDescription("remove coins from a user")
+                .addMentionableOption((opt) =>
+                    opt
+                        .setName("user")
+                        .setDescription("The user to remove coins from.")
+                        .setRequired(true)
+                )
+                .addIntegerOption((opt) =>
+                    opt
+                        .setName("amount")
+                        .setDescription("The amount of coins to remove.")
+                        .setRequired(true)
+                        .setMinValue(10)
+                        .setMaxValue(1000)
+                )
+        )
+        .addSubcommand((sub) =>
+            sub
+                .setName("show")
+                .setDescription("show amount of coins for a user")
+                .addMentionableOption((opt) =>
+                    opt.setName("user").setDescription("The target user.").setRequired(true)
+                )
         ),
-    // new SlashCommandBuilder().setName("add").addSubcommand(
-    //     new SlashCommandSubcommandBuilder()
-    //         .setName("coins")
-    //         .setDescription("Add coins to a user.")
-    //         .addMentionableOption(
-    //             new SlashCommandMentionableOption()
-    //               .setName("user")
-    //               .setDescription("The user to add coins to.")
-    //               .setRequired(true)
-    //         )
-    //         .addIntegerOption((opt) =>
-    //             opt.setName("amount").setDescription("The amount of coins to add.")
-    //         )
-    // ),
 ].map((command) => command.toJSON());
 
 const commandsBody = JSON.stringify(commands);
