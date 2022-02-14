@@ -4,6 +4,11 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
+/**
+ * @type Map<Number,  Interaction<CacheType>>
+ */
+const interactionCache = new Map();
+
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isCommand()) {
         const { commandName } = interaction;
@@ -29,10 +34,10 @@ client.on("interactionCreate", async (interaction) => {
                     return;
                 }
                 const amount = options.getInteger("amount");
-                const message = `You want to add ${amount} coins to <@${userOpt.id}>?`;
+                // const message = `You want to add ${amount} coin(s) to <@${userOpt.id}>?`;
                 const row = new MessageActionRow().addComponents(
                     new MessageButton()
-                        .setCustomId("confirm_add")
+                        .setCustomId("add_coins_confirm")
                         .setLabel("Confirm")
                         .setStyle("PRIMARY"),
                     new MessageButton()
@@ -44,8 +49,15 @@ client.on("interactionCreate", async (interaction) => {
                     .setColor("#0099ff")
                     .setTitle("Add Coins")
                     .setURL("https://discord.js.org")
-                    .setDescription(message);
-                console.log(message);
+                    .setFields(
+                        { name: "target", value: `<@${userOpt.id}>` },
+                        { name: "amount", value: `${amount} coin(s)` }
+                    );
+                console.log(
+                    `User ${interaction.user.username} wants to add ${amount} coins to ${userOpt.user.username}.`
+                );
+                interactionCache.set(interaction.user.id, interaction);
+
                 await interaction.reply({
                     embeds: [embed],
                     components: [row],
@@ -57,15 +69,42 @@ client.on("interactionCreate", async (interaction) => {
                 break;
         }
     } else if (interaction.isButton()) {
-      await interaction.reply({content: "Button pressed", ephemeral: true});
+        // for now buttons are only used for commands that require confirmation
+        if (!interactionCache.has(interaction.user.id)) {
+            await interaction.reply({ content: "Interaction cache expired", ephemeral: true });
+            return;
+        }
+        const previousInteraction = interactionCache.get(interaction.user.id);
+        switch (interaction.customId) {
+            case "add_coins_confirm":
+                const options = previousInteraction.options;
+                const target = options.getMentionable("user");
+                const amount = options.getInteger("amount");
+                await interaction.reply({
+                    content: `You have added ${amount} coin(s) to <@${target.id}>`,
+                    ephemeral: true,
+                });
+                console.log(
+                    `User ${target.username} has confirmed adding ${amount} coins to ${target.username}.`
+                );
+                break;
+            case "cancel":
+                await interaction.reply({
+                    content: `Interaction cancelled`,
+                    ephemeral: true,
+                });
+                break;
+            default:
+                await interaction.reply({
+                    content: "Unknown button pressed",
+                    ephemeral: true,
+                });
+                break;
+        }
+        interactionCache.delete(interaction.user.id);
     } else {
-      await interaction.reply({content: "Unknown interaction.", ephemeral: true});
+        await interaction.reply({ content: "Unknown interaction.", ephemeral: true });
     }
-});
-
-client.on("message", async (message) => {
-    console.log(message.content);
-    //message.reply("Hello!");
 });
 
 client.login(process.env.TOKEN);
