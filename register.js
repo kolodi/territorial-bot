@@ -12,6 +12,21 @@ const commands = [
     new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Checks connectivity with discord's servers."),
+    new SlashCommandBuilder()
+        .setName("leaderboard")
+        .setDescription("Shows leaderboard.")
+        .addBooleanOption((opt) =>
+            opt
+                .setName("chat")
+                .setDescription("Display in chat for everyone to see (default false)")
+        )
+        .addIntegerOption((opt) =>
+            opt
+                .setName("limit")
+                .setDescription("The number of users to show (defaiult 10)")
+                .setMinValue(10)
+                .setMaxValue(100)
+        ),
     // new SlashCommandBuilder()
     //     .setName("add-coins")
     //     .setDescription("Add coins to a user.")

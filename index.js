@@ -8,7 +8,7 @@ const {
 } = require("discord.js");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-const { getUserData, setUserData } = require("./territorial-db.js");
+const { getUserData, setUserData, coinsLeaderboard } = require("./territorial-db.js");
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
@@ -29,7 +29,10 @@ client.on("interactionCreate", async (interaction) => {
                 await notYetImplemented(interaction);
                 break;
             case "ping":
-                await interaction.reply("Pong!");
+                await interaction.reply({ content: "Pong!", ephemeral: true });
+                break;
+            case "leaderboard":
+                await showLeaderboard(interaction);
                 break;
             case "coins":
                 const subcommandName = interaction.options.getSubcommand();
@@ -164,7 +167,9 @@ const showUserCoins = async (interaction) => {
         const userData = (await getUserData(target.id)) || {
             coins: 0,
         };
-        console.log(`User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`);
+        console.log(
+            `User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`
+        );
         await interaction.reply({
             content: `<@${target.id}> has ${userData.coins} coin(s)`,
             ephemeral: true,
@@ -192,7 +197,9 @@ const removeCoinsConfirmed = async (previousInteraction, interaction) => {
             content: `You have removed ${removeAmount} coin(s) from <@${target.id}>`,
             ephemeral: true,
         });
-        console.log(`User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`);
+        console.log(
+            `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`
+        );
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");
@@ -236,6 +243,36 @@ const removeCoins = async (interaction) => {
         components: [row],
         ephemeral: true,
     });
+};
+
+const showLeaderboard = async (interaction) => {
+    const options = interaction.options;
+    const limit = options.getInteger("limit") || 10;
+    const ephimeral = !(options.getBoolean("chat") || false);
+
+    console.log(`getting top ${limit} users, user only see: ${ephimeral}`);
+    try {
+        const records = await coinsLeaderboard(limit);
+
+        // joins all user ids into string with each id in a new line
+        const userIds = records.map((record) => `<@${record.userId}>`);
+        const userIdsString = userIds.join("\n");
+        // do the same to coins
+        const coins = records.map((record) => record.coins);
+        const coinsString = coins.join("\n");
+        const places = records.map((record, index) => index + 1);
+        const placesString = places.join("\n");
+        const embed = new MessageEmbed()
+            .setColor("#0099ff")
+            .setTitle("Leaderboard")
+            .addField("#", placesString, true)
+            .addField("User", userIdsString, true)
+            .addField("Coins", coinsString, true);
+        await interaction.reply({ embeds: [embed], ephemeral: ephimeral });
+    } catch (err) {
+        console.error(err);
+        await serverError(interaction, "DB Error");
+    }
 };
 
 const notYetImplemented = async (interaction) => {

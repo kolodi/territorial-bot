@@ -33,3 +33,16 @@ module.exports.setUserData = async (userId, data) => {
     const result = await docRef.set(data);
     return result;
 };
+
+module.exports.coinsLeaderboard = async (limit) => {
+    const query = db.collection("territorial").orderBy("coins", "desc").limit(limit);
+    const result = await query.get();
+    const leaderboard = result.docs.map((doc) => {
+        const data = doc.data();
+        return {
+            userId: doc.id,
+            coins: data.coins
+        };
+    });
+    return leaderboard;
+};
