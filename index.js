@@ -26,7 +26,7 @@ client.on("interactionCreate", async (interaction) => {
 
         switch (commandName) {
             case "help":
-                await notYetImplemented(interaction);
+                await showHelp(interaction);
                 break;
             case "ping":
                 await interaction.reply({ content: "Pong!", ephemeral: true });
@@ -107,7 +107,6 @@ const addCoins = async (interaction) => {
     const embed = new MessageEmbed()
         .setColor("#0099ff")
         .setTitle("Add Coins")
-        .setURL("https://discord.js.org")
         .setFields(
             { name: "target", value: `<@${target.id}>` },
             { name: "amount", value: `${amount} coin(s)` }
@@ -228,7 +227,6 @@ const removeCoins = async (interaction) => {
     const embed = new MessageEmbed()
         .setColor("#0099ff")
         .setTitle("Remove Coins")
-        .setURL("https://discord.js.org")
         .setFields(
             { name: "target", value: `<@${target.id}>` },
             { name: "amount", value: `${amount} coin(s)` }
@@ -274,6 +272,22 @@ const showLeaderboard = async (interaction) => {
         await serverError(interaction, "DB Error");
     }
 };
+
+const showHelp = async (interaction) => {
+    const embed = new MessageEmbed()
+        .setColor("#0099ff")
+        .setTitle("Help")
+        .setDescription(
+            "This bot is used to manage the coins of users.\n\n" +
+            "To add coins to a user, use the command `/coins add`\n" +
+            "To remove coins from a user, use the command `/coins remove`\n" +
+            "To see the coins of a user, use the command `/coins show`\n" +
+            "To see the leaderboard, use the command `/coins leaderboard`");
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+};
+
+
+
 
 const notYetImplemented = async (interaction) => {
     await interaction.reply({ content: "Not yet implemented.", ephemeral: true });

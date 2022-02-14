@@ -11,7 +11,8 @@ const commands = [
         .setDescription("Shows the list of commands or help on specified command."),
     new SlashCommandBuilder()
         .setName("ping")
-        .setDescription("Checks connectivity with discord's servers."),
+        .setDescription("Checks connectivity with discord's servers.")
+        .setDefaultPermission(false),
     new SlashCommandBuilder()
         .setName("leaderboard")
         .setDescription("Shows leaderboard.")
@@ -27,23 +28,10 @@ const commands = [
                 .setMinValue(10)
                 .setMaxValue(100)
         ),
-    // new SlashCommandBuilder()
-    //     .setName("add-coins")
-    //     .setDescription("Add coins to a user.")
-    //     .addMentionableOption((opt) =>
-    //         opt.setName("user").setDescription("The user to add coins to.").setRequired(true)
-    //     )
-    //     .addIntegerOption((opt) =>
-    //         opt
-    //             .setName("amount")
-    //             .setDescription("The amount of coins to add.")
-    //             .setRequired(true)
-    //             .setMinValue(10)
-    //             .setMaxValue(1000)
-    //     ),
     new SlashCommandBuilder()
         .setName("coins")
         .setDescription("add/remove/show coins for a user")
+        .setDefaultPermission(false)
         .addSubcommand((sub) =>
             sub
                 .setName("add")
