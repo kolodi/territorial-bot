@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "register": "node -r dotenv/config register.js",
     "debug": "node -r dotenv/config index.js",
-    "start": "node ."
+    "start": "node -r dotenv/config ."
   },
   "keywords": [],
   "author": "",
@@ -17,7 +17,6 @@
     "@discordjs/rest": "^0.3.0",
     "discord-api-types": "^0.27.0",
     "discord.js": "^13.6.0",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.1"
+    "dotenv": "^16.0.0"
   }
 }

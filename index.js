@@ -68,5 +68,4 @@ client.on("message", async (message) => {
     //message.reply("Hello!");
 });
 
-require("./server")();
 client.login(process.env.TOKEN);
