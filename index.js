@@ -1,6 +1,14 @@
-const { Client, Intents, MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
+const {
+    Client,
+    Intents,
+    MessageActionRow,
+    MessageButton,
+    MessageEmbed,
+    Interaction,
+} = require("discord.js");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const { getUserData, setUserData } = require("./territorial-db.js");
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
@@ -30,10 +38,10 @@ client.on("interactionCreate", async (interaction) => {
                         await addCoins(interaction);
                         break;
                     case "remove":
-                        await notYetImplemented(interaction);
+                        await removeCoins(interaction);
                         break;
                     case "show":
-                        await notYetImplemented(interaction);
+                        await showUserCoins(interaction);
                         break;
                     default:
                         await unknownInteraction(interaction);
@@ -54,6 +62,9 @@ client.on("interactionCreate", async (interaction) => {
         switch (interaction.customId) {
             case "add_coins_confirm":
                 await addCoinsConfirmed(previousInteraction, interaction);
+                break;
+            case "remove_coins_confirm":
+                await removeCoinsConfirmed(previousInteraction, interaction);
                 break;
             case "cancel":
                 await interaction.reply({
@@ -110,18 +121,122 @@ const addCoins = async (interaction) => {
     });
 };
 
+/**
+ *
+ * @param {Interaction<CacheType>} previousInteraction
+ * @param {Interaction<CacheType>} interaction
+ */
 async function addCoinsConfirmed(previousInteraction, interaction) {
     const options = previousInteraction.options;
     const target = options.getMentionable("user");
     const amount = options.getInteger("amount");
+    try {
+        const userData = (await getUserData(target.id)) || {
+            coins: 0,
+        };
+        userData.coins += amount;
+        await setUserData(target.id, userData);
+    } catch (err) {
+        console.error(err);
+        await serverError(interaction, "DB Error");
+        return;
+    }
     await interaction.reply({
         content: `You have added ${amount} coin(s) to <@${target.id}>`,
         ephemeral: true,
     });
     console.log(
-        `User ${target.username} has confirmed adding ${amount} coins to ${target.username}.`
+        `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}.`
     );
 }
+
+const showUserCoins = async (interaction) => {
+    const options = interaction.options;
+    const target = options.getMentionable("user");
+    if (!target.user || target.user.bot) {
+        await interaction.reply({
+            content: "Not a real user",
+            ephemeral: true,
+        });
+        return;
+    }
+    try {
+        const userData = (await getUserData(target.id)) || {
+            coins: 0,
+        };
+        console.log(`User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`);
+        await interaction.reply({
+            content: `<@${target.id}> has ${userData.coins} coin(s)`,
+            ephemeral: true,
+        });
+    } catch (err) {
+        console.error(err);
+        await serverError(interaction, "DB Error");
+        return;
+    }
+};
+
+const removeCoinsConfirmed = async (previousInteraction, interaction) => {
+    const options = previousInteraction.options;
+    const target = options.getMentionable("user");
+    const amount = options.getInteger("amount");
+    try {
+        const userData = (await getUserData(target.id)) || {
+            coins: 0,
+        };
+        const oldCoins = userData.coins;
+        const removeAmount = Math.min(oldCoins, amount);
+        userData.coins = oldCoins - removeAmount;
+        await setUserData(target.id, userData);
+        await interaction.reply({
+            content: `You have removed ${removeAmount} coin(s) from <@${target.id}>`,
+            ephemeral: true,
+        });
+        console.log(`User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`);
+    } catch (err) {
+        console.error(err);
+        await serverError(interaction, "DB Error");
+        return;
+    }
+};
+
+const removeCoins = async (interaction) => {
+    const options = interaction.options;
+    const target = options.getMentionable("user");
+    if (!target.user || target.user.bot) {
+        await interaction.reply({
+            content: "Not a real user",
+            ephemeral: true,
+        });
+        return;
+    }
+    const amount = options.getInteger("amount");
+    const row = new MessageActionRow().addComponents(
+        new MessageButton()
+            .setCustomId("remove_coins_confirm")
+            .setLabel("Confirm")
+            .setStyle("PRIMARY"),
+        new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("SECONDARY")
+    );
+    const embed = new MessageEmbed()
+        .setColor("#0099ff")
+        .setTitle("Remove Coins")
+        .setURL("https://discord.js.org")
+        .setFields(
+            { name: "target", value: `<@${target.id}>` },
+            { name: "amount", value: `${amount} coin(s)` }
+        );
+    console.log(
+        `User ${interaction.user.username} wants to remove ${amount} coins from ${target.user.username}.`
+    );
+    interactionCache.set(interaction.user.id, interaction);
+
+    await interaction.reply({
+        embeds: [embed],
+        components: [row],
+        ephemeral: true,
+    });
+};
 
 const notYetImplemented = async (interaction) => {
     await interaction.reply({ content: "Not yet implemented.", ephemeral: true });
@@ -129,6 +244,10 @@ const notYetImplemented = async (interaction) => {
 
 const unknownInteraction = async (interaction) => {
     await interaction.reply({ content: "Unknown interaction", ephemeral: true });
+};
+
+const serverError = async (interaction, msg) => {
+    await interaction.reply({ content: msg || "Server error", ephemeral: true });
 };
 
 client.login(process.env.TOKEN);

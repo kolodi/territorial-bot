@@ -5,3 +5,4 @@ payloads.json
 .DS_Store
 test.js
 .vscode
+secrets/*
