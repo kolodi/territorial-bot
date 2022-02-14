@@ -4,3 +4,4 @@ env.json
 payloads.json
 .DS_Store
 test.js
+.vscode
