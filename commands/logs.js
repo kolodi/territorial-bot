@@ -25,11 +25,11 @@ const execute = async (interaction, db) => {
             .setDescription(`Target user: <@${user.id}>`)
             .addFields(
                 ...logs.map((l) => {
-                    const { event_type, user_id, amount, time } = l;
+                    const { event_type, user_id, amount, time, reason } = l;
                     const date = new Date();
                     return {
                         name: `<t:${time.seconds}:R>`,
-                        value: `**${event_type}** by <@${user_id}>, amount: ${amount}`,
+                        value: `**${event_type}** by <@${user_id}>, amount: ${amount}, reason: ${reason}`,
                     };
                 })
             );

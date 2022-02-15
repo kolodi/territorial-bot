@@ -14,6 +14,8 @@ const interactionCache = new Map();
 const addCoins = async (interaction) => {
     const options = interaction.options;
     const target = options.getMentionable("user");
+    const reason = options.getString("reason");
+
     if (!target.user || target.user.bot) {
         await interaction.reply({
             content: "Not a real user",
@@ -35,7 +37,8 @@ const addCoins = async (interaction) => {
         .setTitle("Add Coins")
         .setFields(
             { name: "target", value: `<@${target.id}>` },
-            { name: "amount", value: `${amount} coin(s)` }
+            { name: "amount", value: `${amount} coin(s)` },
+            { name: "reason", value: reason }
         );
     console.log(
         `User ${interaction.user.username} wants to add ${amount} coins to ${target.user.username}.`
@@ -58,6 +61,7 @@ async function addCoinsConfirmed(previousInteraction, interaction, db) {
     const options = previousInteraction.options;
     const target = options.getMentionable("user");
     const amount = options.getInteger("amount");
+    const reason = options.getString("reason");
     try {
         const userData = (await db.getUserData(target.id)) || {
             coins: 0,
@@ -73,6 +77,7 @@ async function addCoinsConfirmed(previousInteraction, interaction, db) {
             target_username: target.user.username,
             amount,
             event_type: "add_coins",
+            reason,
         });
     } catch (err) {
         console.error(err);
@@ -120,6 +125,7 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
     const options = previousInteraction.options;
     const target = options.getMentionable("user");
     const amount = options.getInteger("amount");
+    const reason = options.getString("reason");
     try {
         const userData = (await db.getUserData(target.id)) || {
             coins: 0,
@@ -141,6 +147,7 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
             target_username: target.user.username,
             amount: removeAmount,
             event_type: "remove_coins",
+            reason,
         });
         console.log(
             `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`
@@ -155,6 +162,7 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
 const removeCoins = async (interaction) => {
     const options = interaction.options;
     const target = options.getMentionable("user");
+    const reason = options.getString("reason");
     if (!target.user || target.user.bot) {
         await interaction.reply({
             content: "Not a real user",
@@ -175,7 +183,8 @@ const removeCoins = async (interaction) => {
         .setTitle("Remove Coins")
         .setFields(
             { name: "target", value: `<@${target.id}>` },
-            { name: "amount", value: `${amount} coin(s)` }
+            { name: "amount", value: `${amount} coin(s)` },
+            { name: "reason", value: reason }
         );
     console.log(
         `User ${interaction.user.username} wants to remove ${amount} coins from ${target.user.username}.`

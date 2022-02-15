@@ -17,7 +17,9 @@ const commands = [
         .setName("logs")
         .setDescription("Display user logs.")
         .setDefaultPermission(false)
-        .addMentionableOption((opt) => opt.setName("user").setDescription("User to get logs for.").setRequired(true)),
+        .addMentionableOption((opt) =>
+            opt.setName("user").setDescription("User to get logs for.").setRequired(true)
+        ),
     new SlashCommandBuilder()
         .setName("leaderboard")
         .setDescription("Shows leaderboard.")
@@ -56,6 +58,12 @@ const commands = [
                         .setMinValue(10)
                         .setMaxValue(1000)
                 )
+                .addStringOption((opt) =>
+                    opt
+                        .setName("reason")
+                        .setDescription("Describe the reason for adding coins.")
+                        .setRequired(true)
+                )
         )
         .addSubcommand((sub) =>
             sub
@@ -74,6 +82,12 @@ const commands = [
                         .setRequired(true)
                         .setMinValue(10)
                         .setMaxValue(1000)
+                )
+                .addStringOption((opt) =>
+                    opt
+                        .setName("reason")
+                        .setDescription("Describe the reason for removing coins.")
+                        .setRequired(true)
                 )
         )
         .addSubcommand((sub) =>

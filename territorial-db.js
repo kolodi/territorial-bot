@@ -3,7 +3,12 @@ const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestor
 
 const serviceAccount = require("./secrets/firebase-adminsdk.json");
 
-const collection = "territorial";
+
+const stage = process.env.STAGE;
+const guild_id = process.env.GUILD_ID;
+
+const collection = `${guild_id}-${stage}`;
+const logsCollection = `${guild_id}-${stage}-logs`;
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -42,7 +47,7 @@ const coinsLeaderboard = async (limit) => {
 
 const getLogs = async (userId, limit) => {
     const query = db
-        .collection("logs")
+        .collection(logsCollection)
         .where("target_id", "==", userId)
         .orderBy("time", "desc")
         .limit(limit);
@@ -52,7 +57,7 @@ const getLogs = async (userId, limit) => {
 };
 
 const log = async (data) => {
-    const docRef = db.collection("logs").doc();
+    const docRef = db.collection(logsCollection).doc();
     const updateData = { ...data, time: Timestamp.now() };
     const result = await docRef.set(updateData);
     return result;
