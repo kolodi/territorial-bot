@@ -11,12 +11,16 @@ const permissions = [
     },
 ];
 
+const roleCommands = [
+    "coins", "ping"
+]
+
 const setPermissions = async () => {
     await client.login(process.env.TOKEN);
     const cache = await client.guilds.cache.get(process.env.GUILD_ID);
     const commands = await cache.commands.fetch();
     for (const command of commands.values()) {
-        if (command.name === "coins") {
+        if (roleCommands.includes(command.name)) {
             console.log(command.name);
             const result = await command.permissions.set({permissions});
             console.log(result);
