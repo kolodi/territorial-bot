@@ -64,6 +64,16 @@ async function addCoinsConfirmed(previousInteraction, interaction, db) {
         };
         userData.coins += amount;
         await db.setUserData(target.id, userData);
+        await db.log({
+            guild_id: interaction.guild.id,
+            guild_name: interaction.guild.name,
+            user_id: interaction.user.id,
+            username: interaction.user.username,
+            target_id: target.id,
+            target_username: target.user.username,
+            amount,
+            event_type: "add_coins",
+        });
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");
@@ -121,6 +131,16 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
         await interaction.reply({
             content: `You have removed ${removeAmount} coin(s) from <@${target.id}>`,
             ephemeral: true,
+        });
+        await db.log({
+            guild_id: interaction.guild.id,
+            guild_name: interaction.guild.name,
+            user_id: interaction.user.id,
+            username: interaction.user.username,
+            target_id: target.id,
+            target_username: target.user.username,
+            amount: removeAmount,
+            event_type: "remove_coins",
         });
         console.log(
             `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`

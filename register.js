@@ -14,6 +14,11 @@ const commands = [
         .setDescription("Checks connectivity with discord's servers.")
         .setDefaultPermission(false),
     new SlashCommandBuilder()
+        .setName("logs")
+        .setDescription("Display user logs.")
+        .setDefaultPermission(false)
+        .addMentionableOption((opt) => opt.setName("user").setDescription("User to get logs for.").setRequired(true)),
+    new SlashCommandBuilder()
         .setName("leaderboard")
         .setDescription("Shows leaderboard.")
         .addBooleanOption((opt) =>
@@ -28,9 +33,7 @@ const commands = [
                 .setMinValue(10)
                 .setMaxValue(100)
         ),
-    new SlashCommandBuilder()
-        .setName("profile")
-        .setDescription("Check your profile."),
+    new SlashCommandBuilder().setName("profile").setDescription("Check your profile."),
     new SlashCommandBuilder()
         .setName("coins")
         .setDescription("add/remove/show coins for a user")

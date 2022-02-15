@@ -11,9 +11,7 @@ const permissions = [
     },
 ];
 
-const roleCommands = [
-    "coins", "ping"
-]
+const roleCommands = ["coins", "ping", "logs"];
 
 const setPermissions = async () => {
     await client.login(process.env.TOKEN);
@@ -22,7 +20,7 @@ const setPermissions = async () => {
     for (const command of commands.values()) {
         if (roleCommands.includes(command.name)) {
             console.log(command.name);
-            const result = await command.permissions.set({permissions});
+            const result = await command.permissions.set({ permissions });
             console.log(result);
         }
     }

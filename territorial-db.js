@@ -40,8 +40,28 @@ const coinsLeaderboard = async (limit) => {
     return leaderboard;
 };
 
+const getLogs = async (userId, limit) => {
+    const query = db
+        .collection("logs")
+        .where("target_id", "==", userId)
+        .orderBy("time", "desc")
+        .limit(limit);
+    const result = await query.get();
+    const logs = result.docs.map((doc) => doc.data());
+    return logs;
+};
+
+const log = async (data) => {
+    const docRef = db.collection("logs").doc();
+    const updateData = { ...data, time: Timestamp.now() };
+    const result = await docRef.set(updateData);
+    return result;
+};
+
 module.exports = {
     getUserData,
     setUserData,
     coinsLeaderboard,
+    log,
+    getLogs,
 };

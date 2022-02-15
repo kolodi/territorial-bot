@@ -5,6 +5,8 @@ const pingCommandHandler = require("./commands/ping");
 const leaderboardsCommandHandler = require("./commands/leaderboards");
 const profileCommandHandler = require("./commands/profile");
 const coinsCommandHandler = require("./commands/coins");
+const logsCommandHandler = require("./commands/logs");
+
 const { notYetImplemented, unknownInteraction, serverError } = require("./standard.responses");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
@@ -25,6 +27,9 @@ client.on("interactionCreate", async (interaction) => {
                 break;
             case "ping":
                 await pingCommandHandler.execute(interaction);
+                break;
+            case "logs":
+                await logsCommandHandler.execute(interaction, db);
                 break;
             case "leaderboard":
                 await leaderboardsCommandHandler.execute(interaction, db);
