@@ -29,6 +29,9 @@ const commands = [
                 .setMaxValue(100)
         ),
     new SlashCommandBuilder()
+        .setName("profile")
+        .setDescription("Check your profile."),
+    new SlashCommandBuilder()
         .setName("coins")
         .setDescription("add/remove/show coins for a user")
         .setDefaultPermission(false)

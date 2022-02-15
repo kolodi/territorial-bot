@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "register": "node -r dotenv/config register.js",
+    "permissions": "node -r dotenv/config commands.permissions.js",
     "debug": "node -r dotenv/config index.js",
     "start": "node -r dotenv/config ."
   },

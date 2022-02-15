@@ -34,6 +34,9 @@ client.on("interactionCreate", async (interaction) => {
             case "leaderboard":
                 await showLeaderboard(interaction);
                 break;
+            case "profile":
+                await showUserProfile(interaction);
+                break;
             case "coins":
                 const subcommandName = interaction.options.getSubcommand();
                 switch (subcommandName) {
@@ -279,15 +282,25 @@ const showHelp = async (interaction) => {
         .setTitle("Help")
         .setDescription(
             "This bot is used to manage the coins of users.\n\n" +
-            "To add coins to a user, use the command `/coins add`\n" +
-            "To remove coins from a user, use the command `/coins remove`\n" +
-            "To see the coins of a user, use the command `/coins show`\n" +
-            "To see the leaderboard, use the command `/coins leaderboard`");
+                "To add coins to a user, use the command `/coins add`\n" +
+                "To remove coins from a user, use the command `/coins remove`\n" +
+                "To see the coins of a user, use the command `/coins show`\n" +
+                "To see the leaderboard, use the command `/coins leaderboard`"
+        );
     await interaction.reply({ embeds: [embed], ephemeral: true });
 };
 
-
-
+const showUserProfile = async (interaction) => {
+    const user = interaction.user;
+    const userData = (await getUserData(user.id)) || {
+        coins: 0,
+    };
+    const embed = new MessageEmbed()
+        .setColor("#0099ff")
+        .setTitle(`${user.username}'s Profile`)
+        .setDescription(`You have ${userData.coins} coin(s)`);
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+};
 
 const notYetImplemented = async (interaction) => {
     await interaction.reply({ content: "Not yet implemented.", ephemeral: true });
