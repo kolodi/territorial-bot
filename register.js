@@ -2,8 +2,6 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const {
     SlashCommandBuilder,
-    SlashCommandSubcommandBuilder,
-    SlashCommandMentionableOption,
 } = require("@discordjs/builders");
 const commands = [
     new SlashCommandBuilder()

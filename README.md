@@ -1,13 +1,22 @@
-## registering commands
+## Environment variables
 
 create a file names .env
 
 put environemnt variables in there like so:
 
-TOKEN=
-CLIENT_ID=
-GUILD_ID=
+TOKEN - bot token
+CLIENT_ID - application id
+GUILD_ID - server id
+STAGE - stages (like DEV or PROD)
 
-insert corrisponded values
-
+## Register commands
+Edit `register.js`
 ```npm run register```
+
+## Command Permisisons
+Edit `commands.permissions.js`
+run
+```npm run permissions```
+
+## Themes
+Edit `theme.js`
