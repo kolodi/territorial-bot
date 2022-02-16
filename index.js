@@ -47,7 +47,7 @@ client.on("interactionCreate", async (interaction) => {
                         await coinsCommandHandler.removeCoins(interaction);
                         break;
                     case "show":
-                        await coinsCommandHandler.showUserCoins(interaction);
+                        await coinsCommandHandler.showUserCoins(interaction, db);
                         break;
                     default:
                         await unknownInteraction(interaction);

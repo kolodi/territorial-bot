@@ -93,7 +93,7 @@ async function addCoinsConfirmed(previousInteraction, interaction, db) {
     );
 }
 
-const showUserCoins = async (interaction) => {
+const showUserCoins = async (interaction, db) => {
     const options = interaction.options;
     const target = options.getMentionable("user");
     if (!target.user || target.user.bot) {
@@ -104,7 +104,7 @@ const showUserCoins = async (interaction) => {
         return;
     }
     try {
-        const userData = (await getUserData(target.id)) || {
+        const userData = (await db.getUserData(target.id)) || {
             coins: 0,
         };
         console.log(
