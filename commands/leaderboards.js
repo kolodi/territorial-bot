@@ -5,15 +5,25 @@ const { notYetImplemented, unknownInteraction, serverError } = require("../stand
  *
  * @param { Interaction } interaction
  * @param { any } db
+ * @param { import("../types").UserCache } cache
  */
-const execute = async (interaction, db) => {
+const execute = async (interaction, db, cache) => {
     const options = interaction.options;
     const limit = options.getInteger("limit") || 10;
     const ephimeral = !(options.getBoolean("chat") || false);
-
-    console.log(`getting top ${limit} users, user only see: ${ephimeral}`);
     try {
-        const records = await db.coinsLeaderboard(limit);
+        let top100 = [];
+        const cachedLeaderboard = cache.leaderboard;
+        if (cachedLeaderboard.length > 0) {
+            console.log(`Getting top ${limit} users from Cache`);
+            top100 = cachedLeaderboard;
+        } else {
+            console.log(`Getting top ${limit} users from DB`);
+            top100 = await db.coinsLeaderboard(100);
+            cache.leaderboard = top100;
+        }
+
+        const records = top100.slice(0, limit);
 
         // joins all user ids into string with each id in a new line
         const userIds = records.map((record, index) => `#${index + 1} <@${record.userId}> `);
@@ -32,7 +42,7 @@ const execute = async (interaction, db) => {
         await interaction.reply({ embeds: [embed], ephemeral: ephimeral });
     } catch (err) {
         console.error(err);
-        await serverError(interaction, "DB Error");
+        await serverError(interaction, "Server Error");
     }
 };
 

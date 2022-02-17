@@ -10,16 +10,42 @@ const logsCommandHandler = require("./commands/logs");
 const { notYetImplemented, unknownInteraction, serverError } = require("./standard.responses");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-const db  = require("./territorial-db.js");
+const db = require("./territorial-db.js");
+const { Caching } = require("./Caching");
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+let totalCommandCounter = 0;
+
+const cache = new Caching(60);
+
+const adminCommands = ["coins", "logs"];
+const checkIfAdminCommand = (commandName) => adminCommands.includes(commandName);
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isCommand()) {
-        const { commandName } = interaction;
+        totalCommandCounter++;
 
-        console.log("Command received: ", commandName);
-        console.log("User: ", interaction.user.username);
+        const { commandName, user } = interaction;
+
+        const isAdminCommand = checkIfAdminCommand(commandName);
+        const isUserInCooldown = cache.isUserInCooldown(user.id);
+
+        if (!isAdminCommand && isUserInCooldown) {
+            await interaction.reply({
+                content: `You are in cooldown. Please wait at least 1 minute between commands`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        console.log(`#${totalCommandCounter} User ${user.username} invoked command ${commandName}`);
 
         switch (commandName) {
             case "help":
@@ -32,10 +58,10 @@ client.on("interactionCreate", async (interaction) => {
                 await logsCommandHandler.execute(interaction, db);
                 break;
             case "leaderboard":
-                await leaderboardsCommandHandler.execute(interaction, db);
+                await leaderboardsCommandHandler.execute(interaction, db, cache);
                 break;
             case "profile":
-                await profileCommandHandler.execute(interaction, db);
+                await profileCommandHandler.execute(interaction, db, cache);
                 break;
             case "coins":
                 const subcommandName = interaction.options.getSubcommand();
@@ -47,7 +73,7 @@ client.on("interactionCreate", async (interaction) => {
                         await coinsCommandHandler.removeCoins(interaction);
                         break;
                     case "show":
-                        await coinsCommandHandler.showUserCoins(interaction, db);
+                        await coinsCommandHandler.showUserCoins(interaction, db, cache);
                         break;
                     default:
                         await unknownInteraction(interaction);
@@ -58,9 +84,12 @@ client.on("interactionCreate", async (interaction) => {
                 await unknownInteraction(interaction);
                 break;
         } // end commands switch
+        if (!isAdminCommand) {
+            cache.setUserLastCommandCall(user.id);
+        }
     } else if (interaction.isButton()) {
         // for now buttons are only used for commands that require confirmation
-        coinsCommandHandler.confirmButtonHandler(interaction, db);
+        coinsCommandHandler.confirmButtonHandler(interaction, db, cache);
     } else {
         await unknownInteraction(interaction);
     }

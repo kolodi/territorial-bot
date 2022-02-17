@@ -1,15 +1,17 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
 const { notYetImplemented, unknownInteraction, serverError } = require("../standard.responses");
+const { getUserDataCachedOrDB } = require("./coins");
+const { Caching } = require("../Caching");
 /**
  *
  * @param { Interaction } interaction
+ * @param { any } db
+ * @param { Caching } cache
  */
-const execute = async (interaction, db) => {
+const execute = async (interaction, db, cahce) => {
     const user = interaction.user;
-    const userData = (await db.getUserData(user.id)) || {
-        coins: 0,
-    };
+    const userData = await getUserDataCachedOrDB(user.id, db, cahce);
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
         .setTitle(`${user.username}'s Profile`)

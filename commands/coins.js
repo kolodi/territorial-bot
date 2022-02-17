@@ -1,11 +1,34 @@
 const { MessageEmbed, Interaction, MessageActionRow, MessageButton } = require("discord.js");
 const { theme } = require("../theme");
 const { notYetImplemented, unknownInteraction, serverError } = require("../standard.responses");
+const { Caching } = require("../Caching");
 
 /**
  * @type Map<Number,  Interaction<CacheType>>
  */
 const interactionCache = new Map();
+
+/**
+ *
+ * @param {string | number} userId
+ * @param {*} db
+ * @param {Caching} cache
+ * @returns {import("../types").UserData} UserData
+ */
+const getUserDataCachedOrDB = async (userId, db, cache) => {
+    const id = String(userId);
+    const cachedUser = cache.getUserCache(id);
+    if (cachedUser && cachedUser.data) {
+        console.log(`User ${id} found in cache. Coins: ${cachedUser.data.coins}`);
+        return cachedUser.data;
+    }
+    /**
+     * @type {import("../types").UserData}
+     */
+    const userData = (await db.getUserData(id)) || { coins: 0 };
+    cache.setUserDataCache(id, userData);
+    return userData;
+};
 
 /**
  *
@@ -56,17 +79,18 @@ const addCoins = async (interaction) => {
  *
  * @param {Interaction<CacheType>} previousInteraction
  * @param {Interaction<CacheType>} interaction
+ * @param {Caching} cache
  */
-async function addCoinsConfirmed(previousInteraction, interaction, db) {
+async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
     const options = previousInteraction.options;
     const target = options.getMentionable("user");
     const amount = options.getInteger("amount");
     const reason = options.getString("reason");
     try {
-        const userData = (await db.getUserData(target.id)) || {
-            coins: 0,
-        };
+        const userData = await getUserDataCachedOrDB(target.id, db, cache);
+
         userData.coins += amount;
+
         await db.setUserData(target.id, userData);
         await db.log({
             guild_id: interaction.guild.id,
@@ -79,21 +103,30 @@ async function addCoinsConfirmed(previousInteraction, interaction, db) {
             event_type: "add_coins",
             reason,
         });
+        cache.invalidtateLeaderboardCache();
+        cache.setUserDataCache(target.id, userData);
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");
         return;
     }
     await interaction.reply({
-        content: `You have added ${amount} coin(s) to <@${target.id}>`,
+        content: `You have added ${amount} coin(s) to <@${target.id}>, new amount: ${userData.coins}`,
         ephemeral: true,
     });
     console.log(
-        `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}.`
+        `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
     );
 }
 
-const showUserCoins = async (interaction, db) => {
+/**
+ *
+ * @param {Interaction} interaction
+ * @param {*} db
+ * @param {Caching} cache
+ * @returns
+ */
+const showUserCoins = async (interaction, db, cache) => {
     const options = interaction.options;
     const target = options.getMentionable("user");
     if (!target.user || target.user.bot) {
@@ -104,9 +137,7 @@ const showUserCoins = async (interaction, db) => {
         return;
     }
     try {
-        const userData = (await db.getUserData(target.id)) || {
-            coins: 0,
-        };
+        const userData = await getUserDataCachedOrDB(target.id, db, cache);
         console.log(
             `User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`
         );
@@ -121,21 +152,28 @@ const showUserCoins = async (interaction, db) => {
     }
 };
 
-const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
+/**
+ *
+ * @param {Interaction} previousInteraction
+ * @param {Interaction} interaction
+ * @param {*} db
+ * @param {Caching} cache
+ * @returns
+ */
+const removeCoinsConfirmed = async (previousInteraction, interaction, db, cache) => {
     const options = previousInteraction.options;
     const target = options.getMentionable("user");
     const amount = options.getInteger("amount");
     const reason = options.getString("reason");
     try {
-        const userData = (await db.getUserData(target.id)) || {
-            coins: 0,
-        };
+        const userData = await getUserDataCachedOrDB(target.id, db, cache);
+
         const oldCoins = userData.coins;
         const removeAmount = Math.min(oldCoins, amount);
         userData.coins = oldCoins - removeAmount;
         await db.setUserData(target.id, userData);
         await interaction.reply({
-            content: `You have removed ${removeAmount} coin(s) from <@${target.id}>`,
+            content: `You have removed ${removeAmount} coin(s) from <@${target.id}>, new amount: ${userData.coins}`,
             ephemeral: true,
         });
         await db.log({
@@ -150,8 +188,10 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db) => {
             reason,
         });
         console.log(
-            `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}.`
+            `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}. New amount: ${userData.coins}`
         );
+        cache.invalidtateLeaderboardCache();
+        cache.setUserDataCache(target.id, userData);
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");
@@ -198,7 +238,14 @@ const removeCoins = async (interaction) => {
     });
 };
 
-const confirmButtonHandler = async (interaction, db) => {
+/**
+ *
+ * @param {Interaction} interaction
+ * @param {*} db
+ * @param {Caching} cache
+ * @returns
+ */
+const confirmButtonHandler = async (interaction, db, cache) => {
     if (!interactionCache.has(interaction.user.id)) {
         await interaction.reply({ content: "Interaction cache expired", ephemeral: true });
         return;
@@ -206,10 +253,10 @@ const confirmButtonHandler = async (interaction, db) => {
     const previousInteraction = interactionCache.get(interaction.user.id);
     switch (interaction.customId) {
         case "add_coins_confirm":
-            await addCoinsConfirmed(previousInteraction, interaction, db);
+            await addCoinsConfirmed(previousInteraction, interaction, db, cache);
             break;
         case "remove_coins_confirm":
-            await removeCoinsConfirmed(previousInteraction, interaction, db);
+            await removeCoinsConfirmed(previousInteraction, interaction, db, cache);
             break;
         case "cancel":
             await interaction.reply({
@@ -229,4 +276,5 @@ module.exports = {
     removeCoins,
     showUserCoins,
     confirmButtonHandler,
+    getUserDataCachedOrDB,
 };
