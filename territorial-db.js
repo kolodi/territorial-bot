@@ -1,8 +1,25 @@
 const admin = require("firebase-admin");
 const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestore");
+const fs= require("fs");
 
 const serviceAccount = require("./secrets/firebase-adminsdk.json");
 
+const secrets = {
+    type: process.env.type,
+    project_id: process.env.project_id,
+    private_key_id: process.env.private_key_id,
+    private_key: process.env.private_key,
+    client_email: process.env.client_email,
+    client_id: process.env.client_id,
+    auth_uri: process.env.auth_uri,
+    token_uri: process.env.token_uri,
+    auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
+    client_x509_cert_url: process.env.client_x509_cert_url,
+};
+
+fs.writeFileSync("firebase.json", JSON.stringify(secrets));
+
+const serviceAccount2 = require("./firebase.json");
 
 const stage = process.env.STAGE;
 const guild_id = process.env.GUILD_ID;
@@ -11,7 +28,7 @@ const collection = `${guild_id}-${stage}`;
 const logsCollection = `${guild_id}-${stage}-logs`;
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount2),
     databaseURL: "https://territorial-bot.firebaseio.com",
     authDomain: "territorial-bot.firebaseapp.com",
 });
