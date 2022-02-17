@@ -82,11 +82,11 @@ const addCoins = async (interaction) => {
  * @param {Caching} cache
  */
 async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
-    const options = previousInteraction.options;
-    const target = options.getMentionable("user");
-    const amount = options.getInteger("amount");
-    const reason = options.getString("reason");
     try {
+        const options = previousInteraction.options;
+        const target = options.getMentionable("user");
+        const amount = options.getInteger("amount");
+        const reason = options.getString("reason");
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         userData.coins += amount;
@@ -105,18 +105,18 @@ async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
         });
         cache.invalidtateLeaderboardCache();
         cache.setUserDataCache(target.id, userData);
+        await interaction.reply({
+            content: `You have added ${amount} coin(s) to <@${target.id}>, new amount: ${userData.coins}`,
+            ephemeral: true,
+        });
+        console.log(
+            `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
+        );
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");
         return;
     }
-    await interaction.reply({
-        content: `You have added ${amount} coin(s) to <@${target.id}>, new amount: ${userData.coins}`,
-        ephemeral: true,
-    });
-    console.log(
-        `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
-    );
 }
 
 /**
@@ -161,11 +161,11 @@ const showUserCoins = async (interaction, db, cache) => {
  * @returns
  */
 const removeCoinsConfirmed = async (previousInteraction, interaction, db, cache) => {
-    const options = previousInteraction.options;
-    const target = options.getMentionable("user");
-    const amount = options.getInteger("amount");
-    const reason = options.getString("reason");
     try {
+        const options = previousInteraction.options;
+        const target = options.getMentionable("user");
+        const amount = options.getInteger("amount");
+        const reason = options.getString("reason");
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         const oldCoins = userData.coins;
