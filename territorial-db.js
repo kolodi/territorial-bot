@@ -2,8 +2,6 @@ const admin = require("firebase-admin");
 const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestore");
 const fs= require("fs");
 
-const serviceAccount = require("./secrets/firebase-adminsdk.json");
-
 const secrets = {
     type: process.env.type,
     project_id: process.env.project_id,
