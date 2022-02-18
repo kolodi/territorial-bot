@@ -1,4 +1,21 @@
 const { Client, Intents, Interaction } = require("discord.js");
+const express = require("express");
+
+const app = express();
+
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+app.listen(3000, () => {
+  console.log("Project is running!");
+})
+
+app.get("/", (req, res) => {
+  res.send("this do be a bruh moment");
+})
+
+client.on('ready', () => {
+  client.user.setActivity('test bot', { type: 'PLAYING' })
+})
 
 const helpCommandHandler = require("./commands/help");
 const pingCommandHandler = require("./commands/ping");
@@ -6,10 +23,10 @@ const leaderboardsCommandHandler = require("./commands/leaderboards");
 const profileCommandHandler = require("./commands/profile");
 const coinsCommandHandler = require("./commands/coins");
 const logsCommandHandler = require("./commands/logs");
+const uptimeCommandHandler = require("./commands/uptime");
 
 const { notYetImplemented, unknownInteraction, serverError } = require("./standard.responses");
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 //const db = require("./territorial-db.js");
 const db = {};
 
@@ -22,6 +39,7 @@ function sleep(ms) {
 }
 
 let totalCommandCounter = 0;
+const startTime = new Date();
 
 const cache = new Caching(60);
 
@@ -50,6 +68,9 @@ client.on("interactionCreate", async (interaction) => {
         console.log(`#${totalCommandCounter} User ${user.username} invoked command ${commandName}`);
 
         switch (commandName) {
+            case "uptime":
+                await uptimeCommandHandler.execute(interaction);
+                break;
             case "help":
                 await helpCommandHandler.execute(interaction);
                 break;
@@ -73,6 +94,9 @@ client.on("interactionCreate", async (interaction) => {
                         break;
                     case "remove":
                         await coinsCommandHandler.removeCoins(interaction);
+                        break;
+                    case "transfer":
+                        await notYetImplemented(interaction);
                         break;
                     case "show":
                         await coinsCommandHandler.showUserCoins(interaction, db, cache);

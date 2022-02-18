@@ -1,10 +1,15 @@
 class Caching {
     // here store the user data at runtime
+	//can we use $ instead of #, it's for making them private
     #userCache = new Map();
     #leaderboardCache = [];
     #cooldownBetweenCommandsinMiliseconds = 60000;
     constructor(cooldownSeconds = 60) {
         this.#cooldownBetweenCommandsinMiliseconds = cooldownSeconds * 1000;
+    }
+
+    get cacheSize() {
+      return this.#userCache.size;
     }
 
     /**

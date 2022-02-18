@@ -8,7 +8,8 @@ const execute = async (interaction) => {
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
         .setTitle("Help")
-        .setDescription(
+        /* Old code, but kept it. -Tau
+		.setDescription(
             "**Territorial Bot.**\n\n" +
                 "**Admin comnands:**\n" +
                 "To add coins to a user, use the command `/coins add`\n" +
@@ -17,7 +18,18 @@ const execute = async (interaction) => {
                 "**User comnands:**\n" +
                 "To see the leaderboard, use the command `/leaderboard` \n" +
                 "To see your own profile, use the command `/profile`"
-        );
+		);*/
+		.setDescription("**Territorial Bot.**");
+		.addFields([{
+			name: "Admin Commands",
+			value:	"To add coins to an user, use `/coins add`\n" +
+					"To remove coins from an user, use `/coins remove`\n" +
+					"To see the coins of an user, use `/coins show`"
+		},{
+			name: "User Commands",
+			value:	"To see the leaderboard, use `/leaderboard`\n" +
+					"To see your profile, use `/profile`"
+		}]);
     await interaction.reply({ embeds: [embed], ephemeral: true });
 };
 
