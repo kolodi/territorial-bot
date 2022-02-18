@@ -10,7 +10,9 @@ const logsCommandHandler = require("./commands/logs");
 const { notYetImplemented, unknownInteraction, serverError } = require("./standard.responses");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-const db = require("./territorial-db.js");
+//const db = require("./territorial-db.js");
+const db = {};
+
 const { Caching } = require("./Caching");
 
 function sleep(ms) {

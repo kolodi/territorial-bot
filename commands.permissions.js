@@ -2,7 +2,7 @@ const { Client, Intents } = require("discord.js");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const roleId = "942898354923389038";
+const roleId = "944301303734104145"; // coin master on dev server
 const permissions = [
     {
         id: roleId,
@@ -13,9 +13,15 @@ const permissions = [
 
 const roleCommands = ["coins", "ping", "logs"];
 
+const guildId = "944273910923427920"; // dev server 
+const token = process.env.TOKEN;
+
 const setPermissions = async () => {
-    await client.login(process.env.TOKEN);
-    const cache = await client.guilds.cache.get(process.env.GUILD_ID);
+    console.log(token);
+    console.log(guildId);
+
+    await client.login(token);
+    const cache = await client.guilds.cache.get(guildId);
     const commands = await cache.commands.fetch();
     for (const command of commands.values()) {
         if (roleCommands.includes(command.name)) {

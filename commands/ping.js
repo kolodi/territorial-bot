@@ -9,7 +9,7 @@ const execute = async (interaction) => {
         .setColor(theme.mainColor)
         .setTitle("Ping")
         .setDescription("Hello, I am Territorial Bot.");
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ embeds: [embed], ephemeral: false });
 };
 
 module.exports.execute = execute;
