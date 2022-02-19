@@ -1,6 +1,6 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
-const { notYetImplemented, unknownInteraction, serverError } = require("../standard.responses");
+const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
 const { getUserDataCachedOrDB } = require("./coins");
 const { Caching } = require("../Caching");
 /**

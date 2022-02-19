@@ -1,6 +1,6 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
-const { notYetImplemented, unknownInteraction, serverError } = require("../standard.responses");
+const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
 /**
  *
  * @param { Interaction } interaction

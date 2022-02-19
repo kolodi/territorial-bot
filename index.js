@@ -3,6 +3,7 @@ const express = require("express");
 const fs = require('fs');
 const app = express();
 const config = require("./config");
+const { notYetImplemented, unknownInteraction, serverError } = require("./utils");
 
 
 app.listen(3000, () => {
@@ -59,8 +60,6 @@ commands.set("reload", reloadCommandHandler); // adding special reload command
 client.on('ready', () => {
 	client.user.setActivity('you. Im in your walls.', { type: 'WATCHING' })
 })
-
-const { notYetImplemented, unknownInteraction, serverError } = require("./standard.responses");
 
 //const db = require("./territorial-db.js");
 const db = {};
