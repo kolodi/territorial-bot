@@ -24,7 +24,7 @@ const execute = async (interaction) => {
 		.addFields([{
 			name: "Admin Commands",
 			value: "To see a users information, use `/whois`\n" +
-          "To see the bot's uptime, use `/uptime`\n" +
+          "To see the bot's info, use `/info`\n" +
           "To add coins to an user, use `/coins add`\n" +
 					"To remove coins from an user, use `/coins remove`\n" +
 					"To see the coins of an user, use `/coins show`"
@@ -32,7 +32,6 @@ const execute = async (interaction) => {
 			name: "User Commands",
 			value:	"To see the leaderboard, use `/leaderboard`\n" +
 					"To see your profile, use `/profile`\n" +
-					"To see the bot's latency, use `/ping`\n" +
 					"To see the leaderboard, use `/leaderboards`"
 		}]);
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
