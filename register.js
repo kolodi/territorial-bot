@@ -2,6 +2,11 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const config = require("./config");
 
+//we need a wrapper for this
+//like holy hell
+//lets add things to the command files that the help command can use
+//like name description examples and whatnot
+//lmao
 const {
   SlashCommandBuilder,
 } = require("@discordjs/builders");
@@ -19,16 +24,16 @@ const commands = [
   new SlashCommandBuilder()
     .setName("info")
     .setDescription("Shows information about the bot, like ping, uptime, and other info."),
-  // new SlashCommandBuilder()
-  //     .setName("purge")
-  //     .setDescription("Deletes a specified amount of commands.")
-  //     .addIntegerOption((opt) =>
-  //       opt
-  //         .setName("clear")
-  //         .setDescription("Amount of messages you want to clear. (Default: 10)").setRequired(true)
-  //         .setMinValue(10)
-  //         .setMaxValue(100)
-  //     ), 
+  new SlashCommandBuilder()
+     .setName("purge")
+     .setDescription("Deletes a specified amount of commands.")
+     .addIntegerOption((opt) =>
+       opt
+         .setName("clear")
+         .setDescription("Amount of messages you want to clear. (Default: 10)").setRequired(true)
+         .setMinValue(10)
+         .setMaxValue(100)
+     ), 
   new SlashCommandBuilder()
       .setName("whois")
       .setDescription("Shows information about a specified user.")
