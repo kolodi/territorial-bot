@@ -20,6 +20,9 @@ const commands = [
     .setName("uptime")
     .setDescription("Shows the bots current uptime."),
   new SlashCommandBuilder()
+    .setName("info")
+    .setDescription("Shows information about the bot, like ping, uptime, and other info."),
+  new SlashCommandBuilder()
       .setName("whois")
       .setDescription("Shows information about a specified user.")
       .addMentionableOption((opt) =>
