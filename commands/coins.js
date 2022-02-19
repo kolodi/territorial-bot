@@ -1,4 +1,4 @@
-const { MessageEmbed, Interaction, MessageActionRow, MessageButton } = require("discord.js");
+const { MessageEmbed, Interaction, MessageActionRow, MessageButton, CommandInteraction } = require("discord.js");
 const { theme } = require("../theme");
 const config = require ("../config");
 const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
@@ -33,7 +33,7 @@ const getUserDataCachedOrDB = async (userId, db, cache) => {
 
 /**
  *
- * @param { Interaction } interaction
+ * @param { CommandInteraction } interaction
  */
 const addCoins = async (interaction) => {
     const options = interaction.options;
@@ -73,6 +73,20 @@ const addCoins = async (interaction) => {
         embeds: [embed],
         components: [row],
         ephemeral: config.ephemeral,
+    });
+
+    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 10000, max: 1});
+
+    collector.on("collect", async (i) => {
+        if (i.user.id === interaction.user.id) {
+            i.reply(`${i.user.id} clicked on the ${i.customId} button.`);
+        } else {
+            i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+        }
+    });
+    
+    collector.on('end', collected => {
+        console.log(`Collected ${collected.size} interactions.`);
     });
 };
 
