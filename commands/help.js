@@ -23,7 +23,9 @@ const execute = async (interaction) => {
 		.setDescription("**List of commands that the bot can do:**")
 		.addFields([{
 			name: "Admin Commands",
-			value:	"To add coins to an user, use `/coins add`\n" +
+			value: "To see a users information, use `/whois`\n" +
+          "To see the bot's uptime, use `/uptime`\n" +
+          "To add coins to an user, use `/coins add`\n" +
 					"To remove coins from an user, use `/coins remove`\n" +
 					"To see the coins of an user, use `/coins show`"
 		},{

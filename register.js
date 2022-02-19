@@ -14,6 +14,7 @@ const commands = [
         .setName("name")
         .setDescription("The name of command to reload.")
         .setRequired(true)
+        .addChoices([...config.commands.map(c => ([c,c]))])
     ),
   new SlashCommandBuilder()
     .setName("uptime")
