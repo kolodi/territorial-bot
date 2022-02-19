@@ -12,3 +12,5 @@ module.exports.serverError = async (interaction, msg) => {
 
 
 module.exports.sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+module.exports.getTimeInSeconds = date => date.getTime() / 1000 | 0;

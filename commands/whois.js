@@ -1,5 +1,6 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
+const { getTimeInSeconds } = require("../utils");
 
 const execute = async (interaction, client) => {
   	const { options, user } = interaction;
@@ -24,11 +25,11 @@ const execute = async (interaction, client) => {
   			inline: true
   		}, {
   			name: "Created At:",
-  			value: `<t:${target.createdAt.getTime() / 1000 | 0}:D>`,
+  			value: target.createdAt ? `<t:${getTimeInSeconds(target.createdAt)}:D>` : "Unknown",
   			inline: true
   		}, {
   			name: "Joined At:",
-  			value: `**${member.joinedAt}**`,
+  			value: `<t:${getTimeInSeconds(target.joinedAt)}:D>`,
   			inline: true
   		}, {
   			name: "Nickname:",
