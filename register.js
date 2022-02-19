@@ -22,7 +22,7 @@ const commands = [
       .setName("whois")
       .setDescription("Shows information about a specified user.")
       .addMentionableOption((opt) =>
-        opt.setName("user").setDescription("User you want to get info of.").setRequired(false)
+        opt.setName("user").setDescription("User you want to get info of.").setRequired(true)
       ), 
   new SlashCommandBuilder()
       .setName("help")

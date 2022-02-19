@@ -8,7 +8,7 @@ const execute = async (interaction, client) => {
   	const member = await interaction.guild.members.fetch(target.id);
   	const embed = new MessageEmbed()
   		.setColor(theme.mainColor)
-  		.setTitle(`${target.username}'s Userinfo`)
+  		.setTitle(`${member.displayName}'s Userinfo`)
   		.setDescription(`*Requested by ${user.username}*`)
   		.setThumbnail(target.displayAvatarURL({ dynamic: true }))
   		.addFields([{
@@ -41,7 +41,7 @@ const execute = async (interaction, client) => {
   		}])
   		.setFooter('TerraBot | vi.d.k')
   		.setTimestamp()
-  	await interaction.reply({ content: `Showing ${target.username}'s info`, embeds: [embed] })
+  	await interaction.reply({ content: `Showing ${member.displayName}'s info`, embeds: [embed] })
 }
 
 module.exports.execute = execute;

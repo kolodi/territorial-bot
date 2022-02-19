@@ -53,8 +53,8 @@ const addCoins = async (interaction) => {
         new MessageButton()
             .setCustomId("add_coins_confirm")
             .setLabel("Confirm")
-            .setStyle("PRIMARY"),
-        new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("SECONDARY")
+            .setStyle("SUCCESS"),
+        new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("DANGER")
     );
     const embed = new MessageEmbed()
         .setColor("#0099ff")
