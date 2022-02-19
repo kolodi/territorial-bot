@@ -72,7 +72,7 @@ const addCoins = async (interaction) => {
     await interaction.reply({
         embeds: [embed],
         components: [row],
-        ephemeral: true,
+        ephemeral: config.ephemeral,
     });
 };
 
@@ -108,7 +108,7 @@ async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
         cache.setUserDataCache(target.id, userData);
         await interaction.reply({
             content: `You have added ${amount} coin(s) to <@${target.id}>, new amount: ${userData.coins}`,
-            ephemeral: true,
+            ephemeral: config.ephemeral,
         });
         console.log(
             `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
@@ -144,7 +144,7 @@ const showUserCoins = async (interaction, db, cache) => {
         );
         await interaction.reply({
             content: `<@${target.id}> has ${userData.coins} coin(s)`,
-            ephemeral: true,
+            ephemeral: config.ephemeral,
         });
     } catch (err) {
         console.error(err);
@@ -175,7 +175,7 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db, cache)
         await db.setUserData(target.id, userData);
         await interaction.reply({
             content: `You have removed ${removeAmount} coin(s) from <@${target.id}>, new amount: ${userData.coins}`,
-            ephemeral: true,
+            ephemeral: config.ephemeral,
         });
         await db.log({
             guild_id: interaction.guild.id,
@@ -235,7 +235,7 @@ const removeCoins = async (interaction) => {
     await interaction.reply({
         embeds: [embed],
         components: [row],
-        ephemeral: true,
+        ephemeral: config.ephemeral,
     });
 };
 
@@ -262,7 +262,7 @@ const confirmButtonHandler = async (interaction, db, cache) => {
         case "cancel":
             await interaction.reply({
                 content: `Interaction cancelled`,
-                ephemeral: true,
+                ephemeral: config.ephemeral,
             });
             break;
         default:

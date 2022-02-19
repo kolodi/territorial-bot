@@ -4,6 +4,8 @@ const fs = require('fs');
 const app = express();
 const config = require("./config");
 const { notYetImplemented, unknownInteraction, serverError } = require("./utils");
+const db = require("./territorial-db.js");
+const { Caching } = require("./Caching");
 
 
 app.listen(3000, () => {
@@ -47,52 +49,60 @@ client.on('ready', () => {
 	client.user.setActivity('you. Im in your walls.', { type: 'WATCHING' })
 })
 
-//const db = require("./territorial-db.js");
-const db = {};
-
-const { Caching } = require("./Caching");
-
 let totalCommandCounter = 0;
 const startTime = new Date();
 
-const cache = new Caching(1);
+const cooldownPeriod = process.env.STAGE === "DEV" ? 1 : 60;
+const cache = new Caching(cooldownPeriod);
 
-const adminCommands = ["coins", "logs"];
+const adminCommands = config.admin_commands;
 const checkIfAdminCommand = commandName => adminCommands.includes(commandName);
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}.`));
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isCommand()) {
-        totalCommandCounter++;
+      totalCommandCounter++;
 
-        const { commandName, user } = interaction;
-        const isAdminCommand = checkIfAdminCommand(commandName);
-        const isUserInCooldown = cache.isUserInCooldown(user.id);
+      const { commandName, user } = interaction;
+      const isAdminCommand = checkIfAdminCommand(commandName);
+      const isUserInCooldown = cache.isUserInCooldown(user.id);
 
-        if (!isAdminCommand && isUserInCooldown) {
-            interaction.reply({
-                content: `You are in cooldown. Please wait at least 1 minute between commands`,
-                ephemeral: true,
-            });
-            return;
-        }
+      if (!isAdminCommand && isUserInCooldown) {
+          interaction.reply({
+              content: `You are in cooldown. Please wait at least 1 minute between commands`,
+              ephemeral: true,
+          });
+          return;
+      }
 
     	console.log(`#${totalCommandCounter} User ${user.username} invoked command ${commandName}`);
 
-		const commandHandler = commands.get(commandName);
-		if (commandHandler) {
-			commandHandler.execute(interaction, db, cache, client, totalCommandCounter);
-		} else {
-			unknownInteraction(interaction);
-		}
-		
-        if (!isAdminCommand) {
-            cache.setUserLastCommandCall(user.id);
+      const commandHandler = commands.get(commandName);
+      if (commandHandler) {
+        try {
+          await commandHandler.execute(interaction, db, cache, client, totalCommandCounter);
+        } catch(err) {
+          console.error(commandName, err);
+          await serverError(`Error executing command ${commandName}`);
         }
+      } else {
+        unknownInteraction(interaction);
+      }
+		
+      if (!isAdminCommand) {
+          cache.setUserLastCommandCall(user.id);
+      }
+
     } else if (interaction.isButton()) {
         // for now buttons are only used for commands that require confirmation
-        coinsCommandHandler.confirmButtonHandler(interaction, db, cache);
+        try {
+          const coinsCommandHandler = commands.get("coins");
+          await coinsCommandHandler.confirmButtonHandler(interaction, db, cache);
+        } catch(err) {
+          console.error("Button", err);
+          await serverError();
+        }
     } else {
         unknownInteraction(interaction);
     }

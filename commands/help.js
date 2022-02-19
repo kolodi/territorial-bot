@@ -1,4 +1,5 @@
 const { MessageEmbed, Interaction } = require("discord.js");
+const config = require ("../config");
 const { theme } = require("../theme");
 /**
  *
@@ -32,7 +33,7 @@ const execute = async (interaction) => {
 					"To see the bot's latency, use `/ping`\n" +
 					"To see the leaderboard, use `/leaderboards`"
 		}]);
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
 };
 
 module.exports.execute = execute;

@@ -1,5 +1,6 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
+const config = require ("../config");
 const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
 /**
  *
@@ -33,7 +34,7 @@ const execute = async (interaction, db) => {
                     };
                 })
             );
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
     } catch (err) {
         console.error(err);
         await serverError(interaction, "DB Error");

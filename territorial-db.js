@@ -28,6 +28,8 @@ const getUserData = async (userId) => {
 const setUserData = async (userId, data) => {
     const stringId = String(userId);
     const docRef = db.collection(collection).doc(stringId);
+    console.log("Writing to DB", `Collection: ${collection}, Doc: ${stringId}`);
+    console.log("Data", JSON.stringify(data, null, 2));
     const result = await docRef.set(data);
     return result;
 };
