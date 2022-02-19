@@ -19,7 +19,7 @@ const execute = async (interaction) => {
                 "To see the leaderboard, use the command `/leaderboard` \n" +
                 "To see your own profile, use the command `/profile`"
 		);*/
-		.setDescription("**Territorial Bot.**");
+		.setDescription("**List of commands that the bot can do:**")
 		.addFields([{
 			name: "Admin Commands",
 			value:	"To add coins to an user, use `/coins add`\n" +
@@ -28,9 +28,11 @@ const execute = async (interaction) => {
 		},{
 			name: "User Commands",
 			value:	"To see the leaderboard, use `/leaderboard`\n" +
-					"To see your profile, use `/profile`"
+					"To see your profile, use `/profile`\n" +
+					"To see the bot's latency, use `/ping`\n" +
+					"To see the leaderboard, use `/leaderboards`"
 		}]);
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ embeds: [embed] });
 };
 
 module.exports.execute = execute;

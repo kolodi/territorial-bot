@@ -36,7 +36,7 @@ const execute = async (interaction, db, cache) => {
         const embed = new MessageEmbed()
             .setColor(theme.mainColor)
             .setTitle("Leaderboard")
-            // .addField("#", placesString, true)
+            // .addField("Rank", placesString, true)
             .addField("User", userIdsString, true)
             .addField("Coins", coinsString, true);
         await interaction.reply({ embeds: [embed], ephemeral: ephimeral });

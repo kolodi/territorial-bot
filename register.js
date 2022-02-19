@@ -1,23 +1,38 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
+const config = require("./config");
+
 const {
   SlashCommandBuilder,
 } = require("@discordjs/builders");
 const commands = [
   new SlashCommandBuilder()
+    .setName("reload")
+    .setDescription("Reload a command.")
+    .addStringOption((opt) =>
+      opt
+        .setName("name")
+        .setDescription("The name of command to reload.")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
     .setName("uptime")
-    .setDescription("Shows the list of commands or help on specified command."), 
+    .setDescription("Shows the bots current uptime."),
+  new SlashCommandBuilder()
+      .setName("whois")
+      .setDescription("Shows information about a specified user.")
+      .addMentionableOption((opt) =>
+        opt.setName("user").setDescription("User you want to get info of.").setRequired(false)
+      ), 
   new SlashCommandBuilder()
       .setName("help")
       .setDescription("Shows the list of commands or help on specified command."),
   new SlashCommandBuilder()
     .setName("ping")
-    .setDescription("Checks connectivity with discord's servers.")
-    .setDefaultPermission(false),
+    .setDescription("Checks connectivity with discord's servers."),
   new SlashCommandBuilder()
     .setName("logs")
     .setDescription("Display user logs.")
-    .setDefaultPermission(false)
     .addMentionableOption((opt) =>
       opt.setName("user").setDescription("User to get logs for.").setRequired(true)
     ),
@@ -40,7 +55,6 @@ const commands = [
   new SlashCommandBuilder()
     .setName("coins")
     .setDescription("add/remove/show coins for a user")
-    .setDefaultPermission(false)
     .addSubcommand((sub) =>
       sub
         .setName("add")
@@ -99,9 +113,19 @@ const commands = [
           opt.setName("user").setDescription("The target user.").setRequired(true)
         )
     ),
-].map((command) => command.toJSON());
+];
 
-const commandsBody = JSON.stringify(commands);
+// set default permisisons to false for admin only commands
+const adminOnlyCommnds = config.admin_commands;
+commands.forEach(command => {
+  if(adminOnlyCommnds.includes(command.name)) {
+    command.setDefaultPermission(false);
+  }
+});
+
+const commandsJson = commands.map((command) => command.toJSON());
+
+const commandsBody = JSON.stringify(commandsJson);
 
 const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 

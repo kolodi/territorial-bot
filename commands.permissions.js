@@ -1,17 +1,16 @@
 const { Client, Intents } = require("discord.js");
+const config = require("./config");
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 const roleId = "944301303734104145"; // coin master on dev server
-const permissions = [
-    {
-        id: roleId,
-        type: "ROLE",
-        permission: true,
-    },
-];
+const permissions = [{
+    id: roleId,
+    type: "ROLE",
+    permission: true,
+}];
 
-const roleCommands = ["coins", "ping", "logs"];
+const roleCommands = config.admin_commands;
 
 const guildId = "944273910923427920"; // dev server 
 const token = process.env.TOKEN;

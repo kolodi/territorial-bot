@@ -4,7 +4,7 @@
   "description": "create a file names .env",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node -r dotenv/config test.js",
     "register": "node -r dotenv/config register.js",
     "permissions": "node commands.permissions.js",
     "debug": "node -r dotenv/config index.js",

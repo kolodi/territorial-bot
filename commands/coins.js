@@ -1,5 +1,6 @@
 const { MessageEmbed, Interaction, MessageActionRow, MessageButton } = require("discord.js");
 const { theme } = require("../theme");
+const config = require ("../config");
 const { notYetImplemented, unknownInteraction, serverError } = require("../standard.responses");
 const { Caching } = require("../Caching");
 
@@ -10,23 +11,23 @@ const interactionCache = new Map();
 
 /**
  *
- * @param {string | number} userId
+ * @param {string} userId
  * @param {*} db
  * @param {Caching} cache
  * @returns {import("../types").UserData} UserData
  */
 const getUserDataCachedOrDB = async (userId, db, cache) => {
-    const id = String(userId);
-    const cachedUser = cache.getUserCache(id);
+    if (typeof userId !== "string") throw TypeError("coins.getUserDataCachedOrDB: 'userID' is not of type 'string'!");
+    const cachedUser = cache.getUserCache(userId);
     if (cachedUser && cachedUser.data) {
-        console.log(`User ${id} found in cache. Coins: ${cachedUser.data.coins}`);
+        console.log(`User ${userId} found in cache. Coins: ${cachedUser.data.coins}`);
         return cachedUser.data;
     }
     /**
      * @type {import("../types").UserData}
      */
-    const userData = (await db.getUserData(id)) || { coins: 0 };
-    cache.setUserDataCache(id, userData);
+    const userData = (await db.getUserData(userId)) || { coins: 0 };
+    cache.setUserDataCache(userId, userData);
     return userData;
 };
 
@@ -271,10 +272,32 @@ const confirmButtonHandler = async (interaction, db, cache) => {
     interactionCache.delete(interaction.user.id);
 };
 
+const execute = async (interaction, db, cache) => {
+	//ctrl+c & ctrl+v'd from index.js
+	switch (interaction.options.getSubcommand()) {
+    	case "add":
+    	    addCoins(interaction);
+    	    break;
+    	case "remove":
+    	    removeCoins(interaction);
+    	    break;
+    	case "transfer":
+    	    notYetImplemented(interaction);
+    	    break;
+    	case "show":
+    	    showUserCoins(interaction, db, cache);
+    	    break;
+    	default:
+    	    unknownInteraction(interaction);
+    	    break;
+    }
+};
+
 module.exports = {
-    addCoins,
-    removeCoins,
-    showUserCoins,
-    confirmButtonHandler,
-    getUserDataCachedOrDB,
+	execute,
+  addCoins,
+  removeCoins,
+  showUserCoins,
+  confirmButtonHandler,
+  getUserDataCachedOrDB,
 };

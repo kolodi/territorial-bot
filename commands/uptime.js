@@ -1,14 +1,18 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 
-const execute = async (interaction, client, totalCommandCounter) => {
+const execute = async (interaction, db, cache, client, totalCommandCounter) => {
   
   let days = Math.floor(client.uptime / 86400000);
   let hours = Math.floor(client.uptime / 3600000) % 24;
   let minutes = Math.floor(client.uptime / 60000) % 60;
   let seconds = Math.floor(client.uptime / 1000) % 60;
 
-  let embed = new Discord.MessageEmbed()
-    .setAuthor(`Requested by ${message.author.tag}`)
+	//we are good at coding
+  //ikr
+  //message im actually cracked
+  //LOL
+  let embed = new MessageEmbed()
+    .setAuthor(`Requested by ${interaction.user.username}`)
     .setTitle("Uptime Command")
     .addField(":timer: TerraBot's Uptime:", `**${days}**d **${hours}**h **${minutes}**m **${seconds}**s`)
     .addField(":notepad_spiral: Commands Used", `The total amount of commands used since last restart is **${totalCommandCounter}**`)
