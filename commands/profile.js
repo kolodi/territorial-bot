@@ -11,12 +11,12 @@ const { Caching } = require("../Caching");
  * @param { Caching } cache
  */
 const execute = async (interaction, db, cahce) => {
-    const user = interaction.user;
+    const { user } = interaction;
     const userData = await getUserDataCachedOrDB(user.id, db, cahce);
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
         .setTitle(`${user.username}'s Profile`)
-        .setDescription(`You have ${userData.coins} coin(s)`);
+        .setDescription(`You have ${userData.coins} coins`);
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
 };
 

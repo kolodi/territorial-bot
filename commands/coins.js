@@ -5,11 +5,6 @@ const { notYetImplemented, unknownInteraction, serverError } = require("../utils
 const { Caching } = require("../Caching");
 
 /**
- * @type Map<Number,  Interaction<CacheType>>
- */
-const interactionCache = new Map();
-
-/**
  *
  * @param {string} userId
  * @param {*} db
@@ -18,7 +13,7 @@ const interactionCache = new Map();
  */
 const getUserDataCachedOrDB = async (userId, db, cache) => {
     if (typeof userId !== "string") throw TypeError("coins.getUserDataCachedOrDB: 'userID' is not of type 'string'!");
-    const cachedUser = cache.getUserCache(userId);
+    const cachedUser = cache.getUserCache(userId); // lol
     if (cachedUser && cachedUser.data) {
         console.log(`User ${userId} found in cache. Coins: ${cachedUser.data.coins}`);
         return cachedUser.data;
@@ -35,10 +30,11 @@ const getUserDataCachedOrDB = async (userId, db, cache) => {
  *
  * @param { CommandInteraction } interaction
  */
-const addCoins = async (interaction) => {
+const addCoins = async (interaction, db, cache) => {
     const options = interaction.options;
     const target = options.getMentionable("user");
     const reason = options.getString("reason");
+    const amount = options.getInteger("amount");
 
     if (!target.user || target.user.bot) {
         await interaction.reply({
@@ -47,27 +43,25 @@ const addCoins = async (interaction) => {
         });
         return;
     }
-    const amount = options.getInteger("amount");
     // const message = `You want to add ${amount} coin(s) to <@${userOpt.id}>?`;
     const row = new MessageActionRow().addComponents(
         new MessageButton()
-            .setCustomId("add_coins_confirm")
+            .setCustomId("confirm")
             .setLabel("Confirm")
             .setStyle("SUCCESS"),
         new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("DANGER")
     );
     const embed = new MessageEmbed()
-        .setColor("#0099ff")
+        .setColor(config.mainColor)
         .setTitle("Add Coins")
         .setFields(
-            { name: "target", value: `<@${target.id}>` },
-            { name: "amount", value: `${amount} coin(s)` },
-            { name: "reason", value: reason }
+            { name: "Target", value: `<@${target.id}>` },
+            { name: "Amount", value: `${amount} coin(s)` },
+            { name: "Reason", value: reason }
         );
     console.log(
         `User ${interaction.user.username} wants to add ${amount} coins to ${target.user.username}.`
     );
-    interactionCache.set(interaction.user.id, interaction);
 
     await interaction.reply({
         embeds: [embed],
@@ -75,33 +69,22 @@ const addCoins = async (interaction) => {
         ephemeral: config.ephemeral,
     });
 
-    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 10000, max: 1});
+    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 60000, max: 1});
 
-    collector.on("collect", async (i) => {
-        if (i.user.id === interaction.user.id) {
-            i.reply(`${i.user.id} clicked on the ${i.customId} button.`);
-        } else {
-            i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+    collector.on("collect", async i => {
+        if (i.user.id !== interaction.user.id) {
+          i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+          return;
         }
-    });
-    
-    collector.on('end', collected => {
-        console.log(`Collected ${collected.size} interactions.`);
-    });
-};
 
-/**
- *
- * @param {Interaction<CacheType>} previousInteraction
- * @param {Interaction<CacheType>} interaction
- * @param {Caching} cache
- */
-async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
-    try {
-        const options = previousInteraction.options;
-        const target = options.getMentionable("user");
-        const amount = options.getInteger("amount");
-        const reason = options.getString("reason");
+        const interactionId = i.customId;
+
+        if(interactionId !== "confirm") {
+          i.reply({ content: `Operation cancelled`, ephemeral: true });
+          return;
+        }
+
+            
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         userData.coins += amount;
@@ -120,19 +103,28 @@ async function addCoinsConfirmed(previousInteraction, interaction, db, cache) {
         });
         cache.invalidtateLeaderboardCache();
         cache.setUserDataCache(target.id, userData);
-        await interaction.reply({
-            content: `You have added ${amount} coin(s) to <@${target.id}>, new amount: ${userData.coins}`,
+        await i.update({
+            embeds: [new MessageEmbed()
+              .setColor(theme.mainColor)
+              .setTitle("Coins have been added!")
+              .setFields(
+                  { name: "Target", value: `<@${target.id}>` },
+                  { name: "Added amount", value: `${amount} coins` },
+                  { name: "Reason", value: reason },
+                  { name: "New amount", value: `${userData.coins} coins` },
+              )],
+            components: [],
             ephemeral: config.ephemeral,
         });
         console.log(
             `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
         );
-    } catch (err) {
-        console.error(err);
-        await serverError(interaction, "DB Error");
-        return;
-    }
-}
+    });
+    
+    collector.on('end', collected => {
+        console.log(`Collected ${collected.size} interactions.`);
+    });
+};
 
 /**
  *
@@ -151,46 +143,75 @@ const showUserCoins = async (interaction, db, cache) => {
         });
         return;
     }
-    try {
-        const userData = await getUserDataCachedOrDB(target.id, db, cache);
-        console.log(
-            `User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`
-        );
-        await interaction.reply({
-            content: `<@${target.id}> has ${userData.coins} coin(s)`,
-            ephemeral: config.ephemeral,
-        });
-    } catch (err) {
-        console.error(err);
-        await serverError(interaction, "DB Error");
-        return;
-    }
+    const userData = await getUserDataCachedOrDB(target.id, db, cache);
+    console.log(
+        `User ${interaction.user.username} wants to see ${target.user.username}'s coins. The amount is ${userData.coins}`
+    );
+    await interaction.reply({
+        content: `<@${target.id}> has ${userData.coins} coin(s)`,
+        ephemeral: config.ephemeral,
+    });
 };
 
-/**
- *
- * @param {Interaction} previousInteraction
- * @param {Interaction} interaction
- * @param {*} db
- * @param {Caching} cache
- * @returns
- */
-const removeCoinsConfirmed = async (previousInteraction, interaction, db, cache) => {
-    try {
-        const options = previousInteraction.options;
-        const target = options.getMentionable("user");
-        const amount = options.getInteger("amount");
-        const reason = options.getString("reason");
+const removeCoins = async (interaction, db, cache) => {
+    const options = interaction.options;
+    const target = options.getMentionable("user");
+    const reason = options.getString("reason");
+    if (!target.user || target.user.bot) {
+        await interaction.reply({
+            content: "Not a real user",
+            ephemeral: true,
+        });
+        return;
+    }
+    const amount = options.getInteger("amount");
+    const row = new MessageActionRow().addComponents(
+        new MessageButton()
+            .setCustomId("confirm")
+            .setLabel("Confirm")
+            .setStyle("SUCCESS"),
+        new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("DANGER")
+    );
+    const embed = new MessageEmbed()
+        .setColor("#0099ff")
+        .setTitle("Remove Coins")
+        .setFields(
+            { name: "Target", value: `<@${target.id}>` },
+            { name: "Amount", value: `${amount} coins` },
+            { name: "Reason", value: reason }
+        );
+    console.log(
+        `User ${interaction.user.username} wants to remove ${amount} coins from ${target.user.username}.`
+    );
+
+    await interaction.reply({
+        embeds: [embed],
+        components: [row],
+        ephemeral: config.ephemeral,
+    });
+
+    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 60000, max: 1});
+
+    collector.on("collect", async i => {
+        if (i.user.id !== interaction.user.id) {
+          i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+          return;
+        }
+
+        const interactionId = i.customId;
+
+        if(interactionId !== "confirm") {
+          i.reply({ content: `Operation cancelled`, ephemeral: true });
+          return;
+        }
+
+            
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         const oldCoins = userData.coins;
         const removeAmount = Math.min(oldCoins, amount);
         userData.coins = oldCoins - removeAmount;
         await db.setUserData(target.id, userData);
-        await interaction.reply({
-            content: `You have removed ${removeAmount} coin(s) from <@${target.id}>, new amount: ${userData.coins}`,
-            ephemeral: config.ephemeral,
-        });
         await db.log({
             guild_id: interaction.guild.id,
             guild_name: interaction.guild.name,
@@ -205,95 +226,34 @@ const removeCoinsConfirmed = async (previousInteraction, interaction, db, cache)
         console.log(
             `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}. New amount: ${userData.coins}`
         );
-        cache.invalidtateLeaderboardCache();
-        cache.setUserDataCache(target.id, userData);
-    } catch (err) {
-        console.error(err);
-        await serverError(interaction, "DB Error");
-        return;
-    }
-};
-
-const removeCoins = async (interaction) => {
-    const options = interaction.options;
-    const target = options.getMentionable("user");
-    const reason = options.getString("reason");
-    if (!target.user || target.user.bot) {
-        await interaction.reply({
-            content: "Not a real user",
-            ephemeral: true,
+        await i.update({
+            embeds: [new MessageEmbed()
+              .setColor(theme.mainColor)
+              .setTitle("Coins have been removed!")
+              .setFields(
+                  { name: "Target", value: `<@${target.id}>` },
+                  { name: "Removed amount", value: `${amount} coins` },
+                  { name: "Reason", value: reason },
+                  { name: "New amount", value: `${userData.coins} coins` },
+              )],
+            components: [],
+            ephemeral: config.ephemeral,
         });
-        return;
-    }
-    const amount = options.getInteger("amount");
-    const row = new MessageActionRow().addComponents(
-        new MessageButton()
-            .setCustomId("remove_coins_confirm")
-            .setLabel("Confirm")
-            .setStyle("PRIMARY"),
-        new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("SECONDARY")
-    );
-    const embed = new MessageEmbed()
-        .setColor("#0099ff")
-        .setTitle("Remove Coins")
-        .setFields(
-            { name: "target", value: `<@${target.id}>` },
-            { name: "amount", value: `${amount} coin(s)` },
-            { name: "reason", value: reason }
-        );
-    console.log(
-        `User ${interaction.user.username} wants to remove ${amount} coins from ${target.user.username}.`
-    );
-    interactionCache.set(interaction.user.id, interaction);
-
-    await interaction.reply({
-        embeds: [embed],
-        components: [row],
-        ephemeral: config.ephemeral,
     });
-};
-
-/**
- *
- * @param {Interaction} interaction
- * @param {*} db
- * @param {Caching} cache
- * @returns
- */
-const confirmButtonHandler = async (interaction, db, cache) => {
-    if (!interactionCache.has(interaction.user.id)) {
-        await interaction.reply({ content: "Interaction cache expired", ephemeral: true });
-        return;
-    }
-    const previousInteraction = interactionCache.get(interaction.user.id);
-    switch (interaction.customId) {
-        case "add_coins_confirm":
-            await addCoinsConfirmed(previousInteraction, interaction, db, cache);
-            break;
-        case "remove_coins_confirm":
-            await removeCoinsConfirmed(previousInteraction, interaction, db, cache);
-            break;
-        case "cancel":
-            await interaction.reply({
-                content: `Interaction cancelled`,
-                ephemeral: config.ephemeral,
-            });
-            break;
-        default:
-            await unknownInteraction(interaction);
-            break;
-    }
-    interactionCache.delete(interaction.user.id);
+    
+    collector.on('end', collected => {
+        console.log(`Collected ${collected.size} interactions.`);
+    });
 };
 
 const execute = async (interaction, db, cache) => {
 	//ctrl+c & ctrl+v'd from index.js
 	switch (interaction.options.getSubcommand()) {
     	case "add":
-    	    addCoins(interaction);
+    	    addCoins(interaction, db, cache);
     	    break;
     	case "remove":
-    	    removeCoins(interaction);
+    	    removeCoins(interaction, db, cache);
     	    break;
     	case "transfer":
     	    notYetImplemented(interaction);
@@ -312,6 +272,5 @@ module.exports = {
   addCoins,
   removeCoins,
   showUserCoins,
-  confirmButtonHandler,
   getUserDataCachedOrDB,
 };

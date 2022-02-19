@@ -79,32 +79,23 @@ client.on("interactionCreate", async (interaction) => {
     	console.log(`#${totalCommandCounter} User ${user.username} invoked command ${commandName}`);
 
       const commandHandler = commands.get(commandName);
-      if (commandHandler) {
-        try {
-          await commandHandler.execute(interaction, db, cache, client, totalCommandCounter);
-        } catch(err) {
-          console.error(commandName, err);
-          await serverError(`Error executing command ${commandName}`);
-        }
-      } else {
-        unknownInteraction(interaction);
+      if (!commandHandler) {
+        await unknownInteraction(interaction);
+        return;
+      }
+
+      try {
+        await commandHandler.execute(interaction, db, cache, client, totalCommandCounter);
+      } catch(err) {
+        console.error(commandName, err);
+        //await interaction.update("Something went wrong");
+        return;
       }
 		
       if (!isAdminCommand) {
           cache.setUserLastCommandCall(user.id);
       }
 
-    } else if (interaction.isButton()) {
-        // for now buttons are only used for commands that require confirmation
-        try {
-          const coinsCommandHandler = commands.get("coins");
-          await coinsCommandHandler.confirmButtonHandler(interaction, db, cache);
-        } catch(err) {
-          console.error("Button", err);
-          await serverError();
-        }
-    } else {
-        unknownInteraction(interaction);
     }
 });
 

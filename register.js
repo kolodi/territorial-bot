@@ -17,11 +17,18 @@ const commands = [
         .addChoices([...config.commands.map(c => ([c,c]))])
     ),
   new SlashCommandBuilder()
-    .setName("uptime")
-    .setDescription("Shows the bots current uptime."),
-  new SlashCommandBuilder()
     .setName("info")
     .setDescription("Shows information about the bot, like ping, uptime, and other info."),
+  // new SlashCommandBuilder()
+  //     .setName("purge")
+  //     .setDescription("Deletes a specified amount of commands.")
+  //     .addIntegerOption((opt) =>
+  //       opt
+  //         .setName("clear")
+  //         .setDescription("Amount of messages you want to clear. (Default: 10)").setRequired(true)
+  //         .setMinValue(10)
+  //         .setMaxValue(100)
+  //     ), 
   new SlashCommandBuilder()
       .setName("whois")
       .setDescription("Shows information about a specified user.")
@@ -31,9 +38,6 @@ const commands = [
   new SlashCommandBuilder()
       .setName("help")
       .setDescription("Shows the list of commands or help on specified command."),
-  new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Checks connectivity with discord's servers."),
   new SlashCommandBuilder()
     .setName("logs")
     .setDescription("Display user logs.")
@@ -51,7 +55,7 @@ const commands = [
     .addIntegerOption((opt) =>
       opt
         .setName("limit")
-        .setDescription("The number of users to show (defaiult 10)")
+        .setDescription("The number of users to show (default 10)")
         .setMinValue(10)
         .setMaxValue(100)
     ),
