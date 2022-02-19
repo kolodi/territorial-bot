@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraBot</title>
+</head>
+<body>
+  <p style="font-family: Consolas"></p>
+  <script>
+    const p = document.querySelector('p');
+    let i = 0;
+    setInterval(blooper => {
+      // this script supports infinite text length
+      // but make sure to change the interval delay from 333 to
+      // something smaller if you want to make it say large text
+      //for help, ask taureon
+
+      p.innerText = blooper.slice(0, ++i);
+      i %= blooper.length;
+
+    }, 333, "This app barely works!"); //you can change this text to anything
+  </script>
+    
+</body>
+</html>

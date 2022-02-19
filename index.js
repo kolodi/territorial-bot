@@ -11,23 +11,9 @@ app.listen(3000, () => {
 })
 
 app.get("/", (req, res) => {
-  res.send(`
-<p style="font-family: Consolas"></p>
-<script>
-	let p = document.getElementsByTagName('p')[0],
-		i = 0;
-	setInterval(blooper => {
-
-		// this script supports infinite text length
-		// but make sure to change the interval delay from 333 to
-		// something smaller if you want to make it say large text
-		//for help, ask taureon
-
-		p.innerText = blooper.slice(0, ++i);
-		i %= blooper.length;
-
-	}, 333, "This app barely works!"); //you can change this text to anything
-</script>`);
+  res.sendFile("index.html", {
+    root: __dirname
+  });
 });
 
 const reloadCommandHandler = {
