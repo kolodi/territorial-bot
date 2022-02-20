@@ -1,30 +1,8 @@
 const { MessageEmbed, Interaction, MessageActionRow, MessageButton, CommandInteraction } = require("discord.js");
 const { theme } = require("../theme");
 const config = require ("../config");
-const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
+const { getUserDataCachedOrDB, notYetImplemented, unknownInteraction, serverError } = require("../utils");
 const { Caching } = require("../Caching");
-
-/**
- *
- * @param {string} userId
- * @param {*} db
- * @param {Caching} cache
- * @returns {import("../types").UserData} UserData
- */
-const getUserDataCachedOrDB = async (userId, db, cache) => {
-    if (typeof userId !== "string") throw TypeError("coins.getUserDataCachedOrDB: 'userID' is not of type 'string'!");
-    const cachedUser = cache.getUserCache(userId); // lol
-    if (cachedUser && cachedUser.data) {
-        console.log(`User ${userId} found in cache. Coins: ${cachedUser.data.coins}`);
-        return cachedUser.data;
-    }
-    /**
-     * @type {import("../types").UserData}
-     */
-    const userData = (await db.getUserData(userId)) || { coins: 0 };
-    cache.setUserDataCache(userId, userData);
-    return userData;
-};
 
 /**
  *
@@ -267,10 +245,4 @@ const execute = async (interaction, db, cache) => {
     }
 };
 
-module.exports = {
-	execute,
-  addCoins,
-  removeCoins,
-  showUserCoins,
-  getUserDataCachedOrDB,
-};
+module.exports = { execute };

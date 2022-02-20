@@ -1,15 +1,8 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const config = require("./config");
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-//we need a wrapper for this
-//like holy hell
-//lets add things to the command files that the help command can use
-//like name description examples and whatnot
-//lmao
-const {
-  SlashCommandBuilder,
-} = require("@discordjs/builders");
 const commands = [
   new SlashCommandBuilder()
     .setName("reload")
@@ -118,6 +111,40 @@ const commands = [
             .setRequired(true)
         )
     )
+    /**
+     * .addSubcommand((sub) =>
+      sub
+        .setName("transfer")
+        .setDescription("Move coins from one user to another.")
+        .addMentionableOption((opt) =>
+          opt
+            .setName("from")
+            .setDescription("The user to remove coins from for transfer.")
+            .setRequired(true)
+        )
+        .addMentionableOption((opt) =>
+          opt
+            .setName("to")
+            .setDescription("The user to transfer the coins to.")
+            .setRequired(true)
+        )
+        .addIntegerOption((opt) =>
+          opt
+            .setName("amount")
+            .setDescription("The amount of coins to transfer.")
+            .setRequired(true)
+            .setMinValue(10)
+            .setMaxValue(1000)
+        )
+        .addStringOption((opt) =>
+          opt
+            .setName("reason")
+            .setDescription("Describe the reason for transfering coins.")
+            .setRequired(true)
+        )
+    )
+     */
+    
     .addSubcommand((sub) =>
       sub
         .setName("show")

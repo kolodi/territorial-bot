@@ -1,8 +1,7 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
 const config = require ("../config");
-const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
-const { getUserDataCachedOrDB } = require("./coins");
+const { getUserDataCachedOrDB, notYetImplemented, unknownInteraction, serverError } = require("../utils");
 const { Caching } = require("../Caching");
 /**
  *
@@ -15,6 +14,7 @@ const execute = async (interaction, db, cahce) => {
     const userData = await getUserDataCachedOrDB(user.id, db, cahce);
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
+        .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
         .setTitle(`${user.username}'s Profile`)
         .setDescription(`You have ${userData.coins} coins`);
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });

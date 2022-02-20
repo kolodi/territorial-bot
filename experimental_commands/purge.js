@@ -37,7 +37,7 @@ const execute = async (interaction, db, cache, client) => {
         .setColor("RED")
         .setTimestamp()
       let success = new MessageEmbed()
-        .setAuthor(`Purged by ${interaction.member.displayName}`, message.author.displayAvatarURL())
+        .setAuthor(`Purged by ${interaction.member.displayName}`, interaction.member.displayAvatarURL())
         .setTitle("Purge Command")
         .setDescription(`:white_check_mark: **| Succesfully cleared ${clear} messages!**`)
         .setFooter(".")

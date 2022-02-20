@@ -3,7 +3,6 @@ const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestor
 
 const serviceAccount = require("./secrets/firebase-adminsdk.json");
 
-
 const stage = process.env.STAGE;
 const guild_id = process.env.GUILD_ID;
 
@@ -15,6 +14,33 @@ admin.initializeApp({
     databaseURL: "https://territorial-bot.firebaseio.com",
     authDomain: "territorial-bot.firebaseapp.com",
 });
+
+class TerritorialDB {
+	constructor () {
+
+	}
+	async getUserData (userId) {
+		const docRef = db.collection(collection).doc(userId);
+		const result = await docRef.get();
+		return result.data();
+	}
+	async setUserData () {
+		const stringId = String(userId);
+		const docRef = db.collection(collection).doc(stringId);
+		console.log(`Writing to DB\nCollection: ${collection}, Doc: ${stringId}\nData: ${JSON.stringify(data, null, 2)}`);
+		const result = await docRef.set(data);
+		return result;
+	}
+	coinsLeaderboard () {
+		
+	}
+	getLogs () {
+
+	}
+	log () {
+
+	}
+}
 
 const db = getFirestore();
 

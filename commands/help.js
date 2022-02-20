@@ -21,6 +21,7 @@ const execute = async (interaction) => {
                 "To see your own profile, use the command `/profile`"
 		);*/
 		.setDescription("**List of commands that the bot can do:**")
+    .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
 		.addFields([{
 			name: "Admin Commands",
 			value: "To see a users information, use `/whois`\n" +
