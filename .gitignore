@@ -6,3 +6,4 @@ payloads.json
 test.js
 .vscode
 secrets/*
+firebase.json
