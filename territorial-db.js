@@ -27,8 +27,8 @@ const creatSecretFileFromEnv = () => {
         auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
         client_x509_cert_url: process.env.client_x509_cert_url,
     };
-    fs.writeFileSync("firebase.json", JSON.stringify(secrets));
-    const serviceAccountFile = require("./firebase.json");
+    fs.writeFileSync("./secrets/firebase.json", JSON.stringify(secrets));
+    const serviceAccountFile = require("./secrets/firebase.json");
     return serviceAccountFile;
 };
 
