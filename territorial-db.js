@@ -1,7 +1,38 @@
+const { triggerAsyncId } = require("async_hooks");
 const admin = require("firebase-admin");
 const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestore");
+const fs = require("fs");
 
-const serviceAccount = require("./secrets/firebase-adminsdk.json");
+const getSecretFromFile = () => {
+    try {
+        const serviceAccountFile = require("./secrets/firebase-adminsdk.json");
+        return serviceAccountFile;
+    } catch (error) {
+        console.log("Firebase secret file is not found");
+        return null;
+    }
+};
+
+const creatSecretFileFromEnv = () => {
+    console.log("Preparing sectets file from env..");
+    const secrets = {
+        type: process.env.type,
+        project_id: process.env.project_id,
+        private_key_id: process.env.private_key_id,
+        private_key: process.env.private_key,
+        client_email: process.env.client_email,
+        client_id: process.env.client_id,
+        auth_uri: process.env.auth_uri,
+        token_uri: process.env.token_uri,
+        auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
+        client_x509_cert_url: process.env.client_x509_cert_url,
+    };
+    fs.writeFileSync("firebase.json", JSON.stringify(secrets));
+    const serviceAccountFile = require("./firebase.json");
+    return serviceAccountFile;
+};
+
+const serviceAccount = getSecretFromFile() || creatSecretFileFromEnv();
 
 const stage = process.env.STAGE;
 const guild_id = process.env.GUILD_ID;
@@ -15,32 +46,7 @@ admin.initializeApp({
     authDomain: "territorial-bot.firebaseapp.com",
 });
 
-class TerritorialDB {
-	constructor () {
-
-	}
-	async getUserData (userId) {
-		const docRef = db.collection(collection).doc(userId);
-		const result = await docRef.get();
-		return result.data();
-	}
-	async setUserData () {
-		const stringId = String(userId);
-		const docRef = db.collection(collection).doc(stringId);
-		console.log(`Writing to DB\nCollection: ${collection}, Doc: ${stringId}\nData: ${JSON.stringify(data, null, 2)}`);
-		const result = await docRef.set(data);
-		return result;
-	}
-	coinsLeaderboard () {
-		
-	}
-	getLogs () {
-
-	}
-	log () {
-
-	}
-}
+console.log("Firebase client initilized.");
 
 const db = getFirestore();
 
@@ -54,8 +60,6 @@ const getUserData = async (userId) => {
 const setUserData = async (userId, data) => {
     const stringId = String(userId);
     const docRef = db.collection(collection).doc(stringId);
-    console.log("Writing to DB", `Collection: ${collection}, Doc: ${stringId}`);
-    console.log("Data", JSON.stringify(data, null, 2));
     const result = await docRef.set(data);
     return result;
 };

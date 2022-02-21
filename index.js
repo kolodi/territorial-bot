@@ -52,7 +52,7 @@ let totalCommandCounter = 0;
 const startTime = new Date();
 
 const cooldownPeriod = process.env.STAGE === "DEV" ? 1 : 60;
-const cache = new Caching(cooldownPeriod);
+const cache = new Caching(1);
 
 const adminCommands = config.admin_commands;
 const checkIfAdminCommand = commandName => adminCommands.includes(commandName);
