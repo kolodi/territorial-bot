@@ -24,6 +24,7 @@ const execute = async (interaction, db) => {
             .setColor(theme.mainColor)
             .setTitle(`User Logs`)
             .setDescription(`Target user: <@${user.id}>`)
+            .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
             .addFields(
                 ...logs.map((l) => {
                     const { event_type, user_id, amount, time, reason } = l;

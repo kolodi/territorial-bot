@@ -35,20 +35,20 @@ const execute = async (interaction, db, cache, client, totalCommandCounter) => {
       .addField("Created At", `<t:${getTimeInSeconds(client.application.createdTimestamp)}:D>`, true)
       .addField("Language", "**JavaScript** (node v16)")
       .addField("Library", "**discord.js** v13.6.0")
-      .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+      .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
       .setTimestamp();
     const pe = new MessageEmbed()
       .setColor(theme.mainColor)
       .setTitle("Info Command")
       .addField(":desktop: Current Latency", `**${Date.now() - interaction.createdTimestamp}**ms`, true)
-      .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+      .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
       .setTimestamp();
     const ue = new MessageEmbed()
       .setColor(theme.mainColor)
       .setTitle("Info Command")
       .addField(":timer: Uptime", `**${days}**d **${hours}**h **${minutes}**m **${seconds}**s`, true)
       .addField(":notepad_spiral: Commands Used", `The total amount of commands used since last restart is **${totalCommandCounter}**`)
-      .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+      .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
       .setTimestamp();
   interaction.reply({ content: 'This command gives you different information about the bot.', embeds: [ie], components: [btnRow] }).then(msg => {
     const collecter = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 50000})

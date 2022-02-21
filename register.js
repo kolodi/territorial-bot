@@ -111,8 +111,8 @@ const commands = [
             .setRequired(true)
         )
     )
-    /**
-     * .addSubcommand((sub) =>
+    
+    .addSubcommand((sub) =>
       sub
         .setName("transfer")
         .setDescription("Move coins from one user to another.")
@@ -143,7 +143,6 @@ const commands = [
             .setRequired(true)
         )
     )
-     */
     
     .addSubcommand((sub) =>
       sub

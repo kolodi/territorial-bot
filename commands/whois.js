@@ -39,7 +39,7 @@ const execute = async (interaction, client) => {
   			name: `Roles [${member.roles.cache.size}]:`,
   			value: member.roles.cache.map(r => '<@&' + r.id + '>').join(', ')
   		}])
-  		.setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+  		.setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
   		.setTimestamp()
   	await interaction.reply({ content: `Showing ${member.displayName}'s info`, embeds: [embed] })
 }

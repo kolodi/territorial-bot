@@ -14,7 +14,7 @@ const execute = async (interaction, db, cahce) => {
     const userData = await getUserDataCachedOrDB(user.id, db, cahce);
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
-        .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+        .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
         .setTitle(`${user.username}'s Profile`)
         .setDescription(`You have ${userData.coins} coins`);
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });

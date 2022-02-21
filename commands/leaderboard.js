@@ -37,7 +37,7 @@ const execute = async (interaction, db, cache) => {
         const embed = new MessageEmbed()
             .setColor(theme.mainColor)
             .setTitle("Leaderboard")
-            .setFooter(`v0.1 Alpha. Stage: ${process.env.STAGE}`)
+            .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
             // .addField("Rank", placesString, true)
             .addField("User", userIdsString, true)
             .addField("Coins", coinsString, true);

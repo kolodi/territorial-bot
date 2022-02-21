@@ -34,6 +34,9 @@ const reloadCommandHandler = {
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
+client.on('ready', () => {
+	client.user.setActivity('you. Im in your walls.', { type: 'WATCHING' })
+})
 
 const allCommands = config.commands;
 console.log("Commands List: ", allCommands.join(', '));
@@ -44,10 +47,6 @@ const commands = new Map(
 	allCommands.map(command => ([command, require("./commands/" + command)]))
 );
 commands.set("reload", reloadCommandHandler); // adding special reload command
-
-client.on('ready', () => {
-	client.user.setActivity('you. Im in your walls.', { type: 'WATCHING' })
-})
 
 let totalCommandCounter = 0;
 const startTime = new Date();
