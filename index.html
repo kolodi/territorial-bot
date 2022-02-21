@@ -9,18 +9,39 @@
 <body>
   <p style="font-family: Consolas"></p>
   <script>
+	const bloopers = [
+		"Made using Discord.JS!",
+		"Written with Javascript!",
+		"Made using Node.JS!",
+		"Hosted using Replit.com!",
+		"Taureon is the most competent here!",
+		"No, we won't be turning the territorial coins into cryptocurrency!",
+		"Hello!",
+		"@everyone",
+		"98.37% CPU be like",
+		"Purge commands are cringe! >:(",
+		"Also check out TauBot!",
+		"Also check out Team Fortress 2!",
+		"Olirules10 rules!",
+		"Who even USES third party packages?",
+		"Why does Replit have chat if we communicate better using code comments?",
+		"(Pssst! Don't tell them that I like donus!)",
+		"", //get trolled
+		"TODO: Add more bloopers",
+		"//My hope is that this code is so god awful that I am never allowed to write UI code again",
+		"This blooper renderer supports\nnewlines!",
+		"x x x\n_ O O\nO _ X"
+		//add more bloopers if you want
+	]
+	const random = Math.floor(Math.random() * bloopers.length);
     const p = document.querySelector('p');
     let i = 0;
     setInterval(blooper => {
-      // this script supports infinite text length
-      // but make sure to change the interval delay from 333 to
-      // something smaller if you want to make it say large text
-      // for help, ask taureon
 
       p.innerText = blooper.slice(0, ++i);
       i %= blooper.length;
 
-    }, 333, "TerraBot do be a massive bruh moment tbh lololol haha this is a cry for help :DDDDD."); //you can change this text to anything
+    }, 75, bloopers[random] + " ".repeat(15));
   </script>
     
 </body>

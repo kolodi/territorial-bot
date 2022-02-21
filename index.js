@@ -1,7 +1,7 @@
 const { Client, Intents, Interaction } = require("discord.js");
 const express = require("express");
-const fs = require('fs');
 const app = express();
+const fs = require('fs');
 const config = require("./config");
 const { notYetImplemented, unknownInteraction, serverError } = require("./utils");
 const db = require("./territorial-db.js");
