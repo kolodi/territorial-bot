@@ -73,7 +73,17 @@ const execute = async (interaction, db, cache, client, totalCommandCounter) => {
     })
 }
 
-module.exports.execute = execute;
+module.exports = {
+	/*slashCMDBuilder = {
+		name: "info", //ok hold on //do it now
+		des// let me commit first and pull som external changes
+    
+	},*/
+		//new SlashCommandBuilder()
+    	//.setName("info")
+    	//.setDescription("Shows information about the bot, like ping, uptime, and other info."),
+	execute
+};
 
 /**
  * const btnRow = new MessageActionRow().addComponents(
