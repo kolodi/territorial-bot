@@ -1,14 +1,29 @@
-const { MessageEmbed, Interaction, MessageActionRow, MessageButton, CommandInteraction } = require("discord.js");
+const {
+    MessageEmbed,
+    Interaction,
+    MessageActionRow,
+    MessageButton,
+    CommandInteraction,
+} = require("discord.js");
 const { theme } = require("../theme");
-const config = require ("../config");
-const { getUserDataCachedOrDB, notYetImplemented, unknownInteraction, serverError } = require("../utils");
+const config = require("../config");
+const {
+    getUserDataCachedOrDB,
+    notYetImplemented,
+    unknownInteraction,
+    serverError,
+} = require("../utils");
 const { Caching } = require("../Caching");
+const { CommandHandler, CommandHandlerOptions } = require("../types");
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
 /**
  *
  * @param { CommandInteraction } interaction
+ * @param { CommandHandlerOptions } opts
  */
-const addCoins = async (interaction, db, cache) => {
+const addCoins = async (interaction, opts) => {
+    const { db, cache } = opts;
     const options = interaction.options;
     const target = options.getMentionable("user");
     const reason = options.getString("reason");
@@ -23,10 +38,7 @@ const addCoins = async (interaction, db, cache) => {
     }
     // const message = `You want to add ${amount} coin(s) to <@${userOpt.id}>?`;
     const row = new MessageActionRow().addComponents(
-        new MessageButton()
-            .setCustomId("confirm")
-            .setLabel("Confirm")
-            .setStyle("SUCCESS"),
+        new MessageButton().setCustomId("confirm").setLabel("Confirm").setStyle("SUCCESS"),
         new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("DANGER")
     );
     const embed = new MessageEmbed()
@@ -47,22 +59,25 @@ const addCoins = async (interaction, db, cache) => {
         ephemeral: config.ephemeral,
     });
 
-    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 60000, max: 1});
+    const collector = interaction.channel.createMessageComponentCollector({
+        componentType: "BUTTON",
+        time: 60000,
+        max: 1,
+    });
 
-    collector.on("collect", async i => {
+    collector.on("collect", async (i) => {
         if (i.user.id !== interaction.user.id) {
-          i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-          return;
+            i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+            return;
         }
 
         const interactionId = i.customId;
 
-        if(interactionId !== "confirm") {
-          i.reply({ content: `Operation cancelled`, ephemeral: true });
-          return;
+        if (interactionId !== "confirm") {
+            i.reply({ content: `Operation cancelled`, ephemeral: true });
+            return;
         }
 
-            
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         userData.coins += amount;
@@ -82,15 +97,17 @@ const addCoins = async (interaction, db, cache) => {
         cache.invalidtateLeaderboardCache();
         cache.setUserDataCache(target.id, userData);
         await i.update({
-            embeds: [new MessageEmbed()
-              .setColor(theme.mainColor)
-              .setTitle("Coins have been added!")
-              .setFields(
-                  { name: "Target", value: `<@${target.id}>` },
-                  { name: "Added amount", value: `${amount} coins` },
-                  { name: "Reason", value: reason },
-                  { name: "New amount", value: `${userData.coins} coins` },
-              )],
+            embeds: [
+                new MessageEmbed()
+                    .setColor(theme.mainColor)
+                    .setTitle("Coins have been added!")
+                    .setFields(
+                        { name: "Target", value: `<@${target.id}>` },
+                        { name: "Added amount", value: `${amount} coins` },
+                        { name: "Reason", value: reason },
+                        { name: "New amount", value: `${userData.coins} coins` }
+                    ),
+            ],
             components: [],
             ephemeral: config.ephemeral,
         });
@@ -98,8 +115,8 @@ const addCoins = async (interaction, db, cache) => {
             `User ${interaction.user.username} has confirmed adding ${amount} coins to ${target.user.username}. New amount: ${userData.coins}`
         );
     });
-    
-    collector.on('end', collected => {
+
+    collector.on("end", (collected) => {
         console.log(`Collected ${collected.size} interactions.`);
     });
 };
@@ -107,11 +124,11 @@ const addCoins = async (interaction, db, cache) => {
 /**
  *
  * @param {Interaction} interaction
- * @param {*} db
- * @param {Caching} cache
+ * @param {CommandHandlerOptions} opts
  * @returns
  */
-const showUserCoins = async (interaction, db, cache) => {
+const showUserCoins = async (interaction, opts) => {
+    const { db, cache } = opts;
     const options = interaction.options;
     const target = options.getMentionable("user");
     if (!target.user || target.user.bot) {
@@ -131,7 +148,14 @@ const showUserCoins = async (interaction, db, cache) => {
     });
 };
 
-const removeCoins = async (interaction, db, cache) => {
+/**
+ *
+ * @param {CommandInteraction} interaction
+ * @param {CommandHandlerOptions} opts
+ * @returns
+ */
+const removeCoins = async (interaction, opts) => {
+    const { db, cache } = opts;
     const options = interaction.options;
     const target = options.getMentionable("user");
     const reason = options.getString("reason");
@@ -144,10 +168,7 @@ const removeCoins = async (interaction, db, cache) => {
     }
     const amount = options.getInteger("amount");
     const row = new MessageActionRow().addComponents(
-        new MessageButton()
-            .setCustomId("confirm")
-            .setLabel("Confirm")
-            .setStyle("SUCCESS"),
+        new MessageButton().setCustomId("confirm").setLabel("Confirm").setStyle("SUCCESS"),
         new MessageButton().setCustomId("cancel").setLabel("Cancel").setStyle("DANGER")
     );
     const embed = new MessageEmbed()
@@ -168,22 +189,25 @@ const removeCoins = async (interaction, db, cache) => {
         ephemeral: config.ephemeral,
     });
 
-    const collector = interaction.channel.createMessageComponentCollector({componentType: "BUTTON", time: 60000, max: 1});
+    const collector = interaction.channel.createMessageComponentCollector({
+        componentType: "BUTTON",
+        time: 60000,
+        max: 1,
+    });
 
-    collector.on("collect", async i => {
+    collector.on("collect", async (i) => {
         if (i.user.id !== interaction.user.id) {
-          i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-          return;
+            i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+            return;
         }
 
         const interactionId = i.customId;
 
-        if(interactionId !== "confirm") {
-          i.reply({ content: `Operation cancelled`, ephemeral: true });
-          return;
+        if (interactionId !== "confirm") {
+            i.reply({ content: `Operation cancelled`, ephemeral: true });
+            return;
         }
 
-            
         const userData = await getUserDataCachedOrDB(target.id, db, cache);
 
         const oldCoins = userData.coins;
@@ -205,44 +229,141 @@ const removeCoins = async (interaction, db, cache) => {
             `User ${interaction.user.username} has removed ${removeAmount} coins from ${target.user.username}. New amount: ${userData.coins}`
         );
         await i.update({
-            embeds: [new MessageEmbed()
-              .setColor(theme.mainColor)
-              .setTitle("Coins have been removed!")
-              .setFields(
-                  { name: "Target", value: `<@${target.id}>` },
-                  { name: "Removed amount", value: `${amount} coins` },
-                  { name: "Reason", value: reason },
-                  { name: "New amount", value: `${userData.coins} coins` },
-              )],
+            embeds: [
+                new MessageEmbed()
+                    .setColor(theme.mainColor)
+                    .setTitle("Coins have been removed!")
+                    .setFields(
+                        { name: "Target", value: `<@${target.id}>` },
+                        { name: "Removed amount", value: `${amount} coins` },
+                        { name: "Reason", value: reason },
+                        { name: "New amount", value: `${userData.coins} coins` }
+                    ),
+            ],
             components: [],
             ephemeral: config.ephemeral,
         });
     });
-    
-    collector.on('end', collected => {
+
+    collector.on("end", (collected) => {
         console.log(`Collected ${collected.size} interactions.`);
     });
 };
 
-const execute = async (interaction, db, cache) => {
-	//ctrl+c & ctrl+v'd from index.js
-	switch (interaction.options.getSubcommand()) {
-    	case "add":
-    	    addCoins(interaction, db, cache);
-    	    break;
-    	case "remove":
-    	    removeCoins(interaction, db, cache);
-    	    break;
-    	case "transfer":
-    	    notYetImplemented(interaction);
-    	    break;
-    	case "show":
-    	    showUserCoins(interaction, db, cache);
-    	    break;
-    	default:
-    	    unknownInteraction(interaction);
-    	    break;
+/**
+ *
+ * @param {CommandInteraction} interaction
+ * @param {CommandHandlerOptions} options
+ */
+const execute = async (interaction, options) => {
+    //ctrl+c & ctrl+v'd from index.js
+    switch (interaction.options.getSubcommand()) {
+        case "add":
+            addCoins(interaction, options);
+            break;
+        case "remove":
+            removeCoins(interaction, options);
+            break;
+        case "transfer":
+            notYetImplemented(interaction);
+            break;
+        case "show":
+            showUserCoins(interaction, options);
+            break;
+        default:
+            unknownInteraction(interaction);
+            break;
     }
 };
 
-module.exports = { execute };
+/**
+ * @type {CommandHandler}
+ */
+const handler = {
+    slashCMDBuilder: new SlashCommandBuilder()
+        .setName("coins")
+        .setDescription("add/remove/show coins for a user")
+        .addSubcommand((sub) =>
+            sub .setName("add")
+                .setDescription("add coins to a user")
+                .addMentionableOption((opt) =>
+                    opt .setName("user")
+                        .setDescription("The user to add coins to.")
+                        .setRequired(true)
+                )
+                .addIntegerOption((opt) =>
+                    opt .setName("amount")
+                        .setDescription("The amount of coins to add.")
+                        .setRequired(true)
+                        .setMinValue(10)
+                        .setMaxValue(1000)
+                )
+                .addStringOption((opt) =>
+                    opt .setName("reason")
+                        .setDescription("Describe the reason for adding coins.")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand((sub) =>
+            sub .setName("remove")
+                .setDescription("remove coins from a user")
+                .addMentionableOption((opt) =>
+                    opt .setName("user")
+                        .setDescription("The user to remove coins from.")
+                        .setRequired(true)
+                )
+                .addIntegerOption((opt) =>
+                    opt .setName("amount")
+                        .setDescription("The amount of coins to remove.")
+                        .setRequired(true)
+                        .setMinValue(10)
+                        .setMaxValue(1000)
+                )
+                .addStringOption((opt) =>
+                    opt .setName("reason")
+                        .setDescription("Describe the reason for removing coins.")
+                        .setRequired(true)
+                )
+        )
+
+        .addSubcommand((sub) =>
+            sub .setName("transfer")
+                .setDescription("Move coins from one user to another.")
+                .addMentionableOption((opt) =>
+                    opt .setName("from")
+                        .setDescription("The user to remove coins from for transfer.")
+                        .setRequired(true)
+                )
+                .addMentionableOption((opt) =>
+                    opt .setName("to")
+                        .setDescription("The user to transfer the coins to.")
+                        .setRequired(true)
+                )
+                .addIntegerOption((opt) =>
+                    opt .setName("amount")
+                        .setDescription("The amount of coins to transfer.")
+                        .setRequired(true)
+                        .setMinValue(10)
+                        .setMaxValue(1000)
+                )
+                .addStringOption((opt) =>
+                    opt .setName("reason")
+                        .setDescription("Describe the reason for transfering coins.")
+                        .setRequired(true)
+                )
+        )
+
+        .addSubcommand((sub) =>
+            sub .setName("show")
+                .setDescription("show amount of coins for a user")
+                .addMentionableOption((opt) =>
+                    opt .setName("user")
+                        .setDescription("The target user.")
+                        .setRequired(true)
+                )
+        ),
+    execute,
+    permissionLevel: 1,
+};
+
+module.exports = handler;

@@ -1,13 +1,16 @@
-const { MessageEmbed, Interaction } = require("discord.js");
+const { MessageEmbed, CommandInteraction } = require("discord.js");
 const { theme } = require("../theme");
-const config = require ("../config");
+const config = require("../config");
 const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
+const { CommandHandlerOptions, CommandHandler } = require("../types");
+
 /**
  *
- * @param { Interaction } interaction
- * @param { any } db
+ * @param { CommandInteraction } interaction
+ * @param { CommandHandlerOptions } opts
  */
-const execute = async (interaction, db) => {
+const execute = async (interaction, opts) => {
+    const { db } = opts;
     const user = interaction.options.getMentionable("user");
     if (!user) {
         await interaction.reply({
@@ -42,4 +45,18 @@ const execute = async (interaction, db) => {
     }
 };
 
-module.exports.execute = execute;
+/**
+ * @type { CommandHandler }
+ */
+const handler = {
+    execute,
+    permissionLevel: 2,
+    slashCMDBuilder: new SlashCommandBuilder()
+        .setName("logs")
+        .setDescription("Display user logs.")
+        .addMentionableOption((opt) =>
+            opt.setName("user").setDescription("User to get logs for.").setRequired(true)
+        ),
+};
+
+module.exports = handler;

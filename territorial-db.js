@@ -13,7 +13,6 @@ const getSecretFromFile = () => {
     }
 };
 
-<<<<<<< HEAD
 const serviceAccount = getSecretFromFile() || {
     type: process.env.type,
     project_id: process.env.project_id,
@@ -25,7 +24,7 @@ const serviceAccount = getSecretFromFile() || {
     token_uri: process.env.token_uri,
     auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
     client_x509_cert_url: process.env.client_x509_cert_url,
-=======
+};
 const creatSecretFileFromEnv = () => {
     console.log("Preparing sectets file from env..");
     const secrets = {
@@ -43,7 +42,6 @@ const creatSecretFileFromEnv = () => {
     fs.writeFileSync("./secrets/firebase.json", JSON.stringify(secrets));
     const serviceAccountFile = require("./secrets/firebase.json");
     return serviceAccountFile;
->>>>>>> origin/replit-dev
 };
 
 const stage = process.env.STAGE;
@@ -107,7 +105,56 @@ const log = async (data) => {
     return result;
 };
 
+/* //Use this class once someone figures this out
+
+class DB {
+    constructor () {
+        this.db = db;
+    }
+    async getUserData(userId) {
+        const stringId = String(userId);
+        const docRef = this.db.collection(collection).doc(stringId);
+        const result = await docRef.get();
+        return result.data();
+    }
+    async setUserData(userId, data) {
+        const stringId = String(userId);
+        const docRef = this.db.collection(collection).doc(stringId);
+        const result = await docRef.set(data);
+        return result;
+    }
+    async coinsLeaderboard(limit) {
+        const query = this.db.collection(collection).orderBy("coins", "desc").limit(limit);
+        const result = await query.get();
+        const leaderboard = result.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                userId: doc.id,
+                coins: data.coins,
+            };
+        });
+        return leaderboard;
+    }
+    async getLogs(userId, limit) {
+        const query = this.db
+            .collection(logsCollection)
+            .where("target_id", "==", userId)
+            .orderBy("time", "desc")
+            .limit(limit);
+        const result = await query.get();
+        const logs = result.docs.map((doc) => doc.data());
+        return logs;
+    }
+    async log(data) {
+        const docRef = this.db.collection(logsCollection).doc();
+        const updateData = { ...data, time: Timestamp.now() };
+        const result = await docRef.set(updateData);
+        return result;
+    }
+}*/
+
 module.exports = {
+    DB = module.exports,//DB, //replace this with the DB class when one of us figures out what to put in the class
     getUserData,
     setUserData,
     coinsLeaderboard,

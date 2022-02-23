@@ -1,14 +1,16 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
-const config = require ("../config");
+const config = require("../config");
 const { notYetImplemented, unknownInteraction, serverError } = require("../utils");
+const { CommandHandlerOptions, CommandHandler } = require("../types");
+
 /**
  *
  * @param { Interaction } interaction
- * @param { any } db
- * @param { import("../types").UserCache } cache
+ * @param { CommandHandlerOptions } opts
  */
-const execute = async (interaction, db, cache) => {
+const execute = async (interaction, opts) => {
+    const { db, cache } = opts;
     const options = interaction.options;
     const limit = options.getInteger("limit") || 10;
     const ephimeral = !(options.getBoolean("chat") || false);
@@ -48,4 +50,27 @@ const execute = async (interaction, db, cache) => {
     }
 };
 
-module.exports.execute = execute;
+/**
+ * @type { CommandHandler }
+ */
+const handler = {
+    execute,
+    permissionLevel: 0,
+    slashCMDBuilder: new SlashCommandBuilder()
+        .setName("leaderboard")
+        .setDescription("Shows leaderboard.")
+        .addBooleanOption((opt) =>
+            opt
+                .setName("chat")
+                .setDescription("Display in chat for everyone to see (default false)")
+        )
+        .addIntegerOption((opt) =>
+            opt
+                .setName("limit")
+                .setDescription("The number of users to show (default 10)")
+                .setMinValue(10)
+                .setMaxValue(100)
+        ),
+};
+
+module.exports = handler;

@@ -1,17 +1,18 @@
 const { MessageEmbed, Interaction } = require("discord.js");
 const { theme } = require("../theme");
-const config = require ("../config");
-const { getUserDataCachedOrDB, notYetImplemented, unknownInteraction, serverError } = require("../utils");
-const { Caching } = require("../Caching");
+const config = require("../config");
+const { getUserDataCachedOrDB } = require("../utils");
+const { CommandHandlerOptions } = require("../types");
+
 /**
  *
  * @param { Interaction } interaction
- * @param { any } db
- * @param { Caching } cache
+ * @param { CommandHandlerOptions } opts
  */
-const execute = async (interaction, db, cahce) => {
+const execute = async (interaction, opts) => {
+    const { db, cache } = opts;
     const { user } = interaction;
-    const userData = await getUserDataCachedOrDB(user.id, db, cahce);
+    const userData = await getUserDataCachedOrDB(user.id, db, cache);
     const embed = new MessageEmbed()
         .setColor(theme.mainColor)
         .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
@@ -20,4 +21,15 @@ const execute = async (interaction, db, cahce) => {
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
 };
 
-module.exports.execute = execute;
+/**
+ * @type { CommandHandler }
+ */
+const handler = {
+    execute,
+    permissionLevel: 0,
+    slashCMDBuilder: new SlashCommandBuilder()
+        .setName("profile")
+        .setDescription("Check your profile."),
+};
+
+module.exports = handler;

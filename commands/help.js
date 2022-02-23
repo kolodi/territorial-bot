@@ -1,6 +1,9 @@
 const { MessageEmbed, Interaction } = require("discord.js");
-const config = require ("../config");
+const config = require("../config");
 const { theme } = require("../theme");
+const { CommandHandler, CommandHandlerOptions } = require("../types");
+const { SlashCommandBuilder } = require("@discordjs/builders");
+
 /**
  *
  * @param { Interaction } interaction
@@ -20,21 +23,37 @@ const execute = async (interaction) => {
                 "To see the leaderboard, use the command `/leaderboard` \n" +
                 "To see your own profile, use the command `/profile`"
 		);*/
-		.setDescription("**List of commands that the bot can do:**")
-    .setFooter(`v0.2 Alpha. Stage: ${process.env.STAGE}`)
-		.addFields([{
-			name: "Admin Commands",
-			value: "To see a users information, use `/whois`\n" +
-          "To add coins to an user, use `/coins add`\n" +
-					"To remove coins from an user, use `/coins remove`\n" +
-					"To see the coins of an user, use `/coins show`"
-		},{
-			name: "User Commands",
-			value:	"To see the leaderboard, use `/leaderboard`\n" +
-					"To see your profile, use `/profile`\n" +
-          "To see some information about the bot, use `/info`"
-		}]);
+        .setDescription("**List of commands that the bot can do:**")
+        .setFooter({ text: `v0.2 Alpha. Stage: ${process.env.STAGE}` })
+        .addFields([
+            {
+                name: "Admin Commands",
+                value:
+                    "To see a users information, use `/whois`\n" +
+                    "To add coins to an user, use `/coins add`\n" +
+                    "To remove coins from an user, use `/coins remove`\n" +
+                    "To see the coins of an user, use `/coins show`",
+            },
+            {
+                name: "User Commands",
+                value:
+                    "To see the leaderboard, use `/leaderboard`\n" +
+                    "To see your profile, use `/profile`\n" +
+                    "To see some information about the bot, use `/info`",
+            },
+        ]);
     await interaction.reply({ embeds: [embed], ephemeral: config.ephemeral });
 };
 
-module.exports.execute = execute;
+/**
+ * @type { CommandHandler }
+ */
+const handler = {
+    execute,
+    permissionLevel: 0,
+    slashCMDBuilder: new SlashCommandBuilder()
+        .setName("help")
+        .setDescription("Shows the list of commands or help on specified command."),
+};
+
+module.exports = handler;
