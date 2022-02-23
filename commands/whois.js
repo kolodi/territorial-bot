@@ -17,7 +17,7 @@ const execute = async (interaction, client) => {
   			inline: true
   		}, {
   			name: 'Usertag:',
-  			value: `**${target.tag}**`,
+  			value: `**${target.user.tag}**`,
   			inline: true
   		}, {
   			name: "UserID:",
