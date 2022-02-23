@@ -48,14 +48,8 @@ const execute = async (interaction, db, cache, client) => {
       if (isNaN(clear)) return interaction.reply({ embeds: [non] })
       if (clear > 100) return interaction.reply({ embeds: [msg100] })
       if (clear < 1) return interaction.reply({ embeds: [msg1] })
-      if (!interaction.member.permissions.has('MANAGE_MESSAGES')) return interaction.reply({ embeds: [perms] })
+      if (!interaction.member.permissions.has('MANAGE_MESSAGES')) return interaction.reply({ embeds: [perms] });
 
-	//why does this command exist?
-  // for me to learn things :D
-  //are you gonna delete the command afterwards?
-  // depends on what 4Peace and Big/train say
-  //i am sure that train isnt a dev here
-  // talking about in the discord ill ask him if we should keep it
       interaction.channel.bulkDelete(clear)
       interaction.reply({ embeds: [success]})
 }
