@@ -13,7 +13,6 @@ const getSecretFromFile = () => {
     }
 };
 
-<<<<<<< HEAD
 const serviceAccount = getSecretFromFile() || {
     type: process.env.type,
     project_id: process.env.project_id,
@@ -25,25 +24,6 @@ const serviceAccount = getSecretFromFile() || {
     token_uri: process.env.token_uri,
     auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
     client_x509_cert_url: process.env.client_x509_cert_url,
-=======
-const creatSecretFileFromEnv = () => {
-    console.log("Preparing sectets file from env..");
-    const secrets = {
-        type: process.env.type,
-        project_id: process.env.project_id,
-        private_key_id: process.env.private_key_id,
-        private_key: process.env.private_key,
-        client_email: process.env.client_email,
-        client_id: process.env.client_id,
-        auth_uri: process.env.auth_uri,
-        token_uri: process.env.token_uri,
-        auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
-        client_x509_cert_url: process.env.client_x509_cert_url,
-    };
-    fs.writeFileSync("./secrets/firebase.json", JSON.stringify(secrets));
-    const serviceAccountFile = require("./secrets/firebase.json");
-    return serviceAccountFile;
->>>>>>> origin/replit-dev
 };
 
 const stage = process.env.STAGE;
